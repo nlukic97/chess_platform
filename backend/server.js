@@ -12,6 +12,10 @@ const path = require('path')
 app.use('/', express.static(path.join(__dirname, 'public'))) 
 app.use('/login', express.static(path.join(__dirname, 'public/login.html'))) 
 
+app.get('/users',(req,res)=>{
+  res.status(403).send({errorCode:'1234'})
+})
+
 
 let conn = 0; //nodes connected (if 2, do not allow other socket connections)
 
