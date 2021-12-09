@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chess": "^0.5.0",
     "express": "^4.17.1",
     "socket.io": "^4.3.2"
   },

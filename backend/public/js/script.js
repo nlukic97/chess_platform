@@ -43,4 +43,19 @@ function connectToServer(token){
     socket.on('disconnect',()=>{
         console.log('You have been disconnected');
     })
+
+    // event is fired when a user wants to send a move
+    document.querySelector('button').addEventListener('click',()=>{
+        let move = document.querySelector('input')
+    
+        let data = {
+            move: move.value,
+            user: socket.id
+        }
+        console.log(data);
+        move.value = ''
+    
+        socket.emit('new-move',data)
+    })
 }
+

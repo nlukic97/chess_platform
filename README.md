@@ -20,6 +20,9 @@
 - Allow the 3rd+ client to see a computer analysis of who is curently winning
 ---
 
+#### Interesting link for the chess UI:
+- https://chessboardjs.com/#start
+
 ## Installation
         git clone https://github.com/nlukic97/chess_platform
 
