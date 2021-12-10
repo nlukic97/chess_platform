@@ -40,6 +40,7 @@ io.on('connection', (socket) => {
     let move,status;
     status = gameClient.getStatus();
     
+    
     socket.on('new-move',(data)=>{
       if(Object.keys(status.notatedMoves).includes(data.move)){
         console.log('move is valid');
