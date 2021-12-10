@@ -1,23 +1,26 @@
-async function getToken(){
-    if(document.cookie != ''){
-        return document.cookie.replace('token=','');
-    } else {
-        return await prompt('What is the token?') // it's:  'abc'
-    }
+// async function getToken(){
+//     if(document.cookie != ''){
+//         return document.cookie.replace('token=','');
+//     } else {
+//         return await prompt('What is the token?') // it's:  'abc'
+//     }
     
-}
+// }
 
-getToken().then(ans=>{
-    connectToServer(ans)
-})
+// getToken().then(ans=>{
+//     connectToServer(ans)
+// })
 
+connectToServer()
 
 function connectToServer(token){
-    var socket = io({
-        auth: {
-            token: token
-        }
-    });
+    // var socket = io({
+    //     auth: {
+    //         token: token
+    //     }
+    // });
+
+    var socket = io();
     
     socket.on('connection', (socket) => {
         console.log('connected to the server');
@@ -34,6 +37,11 @@ function connectToServer(token){
         console.log('Successfully authenticated to the server.');
         document.cookie = `token=${token}; expires=Sun, 1 Jan 2023 00:00:00 UTC; path=/`
         console.log(document.cookie);
+
+    })
+
+    socket.on('poruka',(data)=>{
+        console.log(data);
     })
     
     socket.on('redirect',(location)=>{
