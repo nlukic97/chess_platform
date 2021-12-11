@@ -1,61 +1,52 @@
-async function getToken(){
-    if(document.cookie != ''){
-        return document.cookie.replace('token=','');
-    } else {
-        return await prompt('What is the token?') // it's:  'abc'
+var socket = io('http://localhost:3000',{
+    query: {
+        roomId:123
     }
-    
-}
+});
 
-getToken().then(ans=>{
-    connectToServer(ans)
+socket.on('connection', (socket) => {
+    console.log('connected successfully');
+    socket.emit('join-room',roomId)
+    
+    socket.on('chat message', (msg) => {
+        console.log('message: ' + msg);
+    });
+    
+    
+    
+});
+
+// probably should just use http headers, not sure how to do it manually yet
+socket.on('202-connected',(token)=>{
+    console.log('Successfully authenticated to the server.');
+    document.cookie = `token=${token}; expires=Sun, 1 Jan 2023 00:00:00 UTC; path=/`
+    console.log(document.cookie);
+    
 })
 
+socket.on('poruka',(data)=>{
+    console.log(data);
+})
 
-function connectToServer(token){
-    var socket = io({
-        auth: {
-            token: token
-        }
-    });
-    
-    socket.on('connection', (socket) => {
-        console.log('connected to the server');
-        socket.on('chat message', (msg) => {
-            console.log('message: ' + msg);
-        });
-        
-        
-        
-    });
-    
-    // probably should just use http headers, not sure how to do it manually yet
-    socket.on('202-connected',(token)=>{
-        console.log('Successfully authenticated to the server.');
-        document.cookie = `token=${token}; expires=Sun, 1 Jan 2023 00:00:00 UTC; path=/`
-        console.log(document.cookie);
-    })
-    
-    socket.on('redirect',(location)=>{
-        window.location.href = location // '/login' is the redirect location upon auth fail
-    })
-    
-    socket.on('disconnect',()=>{
-        console.log('You have been disconnected');
-    })
+socket.on('redirect',(location)=>{
+    window.location.href = location // '/login' is the redirect location upon auth fail
+})
 
-    // event is fired when a user wants to send a move
-    document.querySelector('button').addEventListener('click',()=>{
-        let move = document.querySelector('input')
+socket.on('disconnect',()=>{
+    console.log('You have been disconnected');
+})
+
+// event is fired when a user wants to send a move
+document.querySelector('button').addEventListener('click',()=>{
+    let move = document.querySelector('input')
     
-        let data = {
-            move: move.value,
-            user: socket.id
-        }
-        console.log(data);
-        move.value = ''
+    let data = {
+        move: move.value,
+        user: socket.id
+    }
+    console.log(data);
+    move.value = ''
     
-        socket.emit('new-move',data)
-    })
-}
+    socket.emit('new-move',data)
+})
 
