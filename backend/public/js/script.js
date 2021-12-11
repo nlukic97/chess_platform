@@ -1,4 +1,8 @@
-var socket = io('http://localhost:3000');
+var socket = io('http://localhost:3000',{
+    query: {
+        roomId:123
+    }
+});
 
 socket.on('connection', (socket) => {
     console.log('connected successfully');
