@@ -27,21 +27,49 @@ function ChessRoom(roomId, ...players){
 }
 
 function Player(socketId){
-  return {socketId: socketId}
+  return {
+    socketId: socketId,
+    pieces:undefined, //assigned upon game start
+    playersTurn:undefined //assigned upon game start
+  }
 }
 
-// let rooms = []
 
-let rooms = [
-  {
-    id:123,
-    // players:[],
-    players:[{socketId:'randomSocketId'}],
-    // players:[{socketId:'randomSocketId'},{socketId:'random2'}],
+/**
+ * Returns an array of objects.
+ * Each object contains data to be assigned to players who are about to start a game.
+ * The data is: which piece the player is, and if it's their turn. ('white' pieces go first, so the turn will be 'true')
+ * */
+function GetPieces(){
+  let randNum = Math.floor(Math.random() * (2 - 0) + 0); // 0 or 1
+
+  if(randNum === 0){
+    return [
+      {assignedPiece:'black', assignedTurn:false},
+      {assignedPiece:'white', assignedTurn:true}
+    ]
+  } else {
+    return [
+      {assignedPiece:'white', assignedTurn:true},
+      {assignedPiece:'black', assignedTurn:false},
+    ];
+
   }
-]
+}
+
+let rooms = []
+
+// let rooms = [
+//   {
+//     id:123,
+    // players:[],
+    // players:[{socketId:'randomSocketId',pieces:undefined, playersTurn:undefined}],
+    // players:[{socketId:'randomSocketId',pieces:undefined},{socketId:'random2',pieces:undefined}],
+  // }
+// ]
 
 io.on('connection', (socket) => {
+
   socketRoomId = parseInt(socket.handshake.query.roomId)
   
   // If the user has not submitted a number parameter to join a room, they will be disconnected
@@ -50,6 +78,13 @@ io.on('connection', (socket) => {
     return socket.disconnect()
   }
   console.log('connected',socket.id);
+  
+  socket.join(socketRoomId) //subscribing the user to the room id which they provided
+
+  // potential for a little backdoor fun here, ide gas
+  if(socket.handshake.query.landscape === 'backend'){
+    console.log('Someone special has joined, give them backdoor chess privileges');
+  }
   
   
   // checking if a room with the submitted socketRoomId exists
@@ -70,18 +105,31 @@ io.on('connection', (socket) => {
     // If there are two players in here at this point, its time to start the game. Otherwise, wait for player 2 to join...
     if(rooms[roomIndex].players.length === 2){
       console.log('Two players are in the game, start it !');
+      
+      // assigning the pieces, and telling each player who is who
+      let assignedData = GetPieces()   
+      for(let i = 0; i <= 1;i++){
+        rooms[roomIndex].players[i].pieces = assignedData[i].assignedPiece
+        rooms[roomIndex].players[i].playersTurn = assignedData[i].assignedTurn
+
+        // sending the game start data to each player individualy who is in a room
+        io.to(rooms[roomIndex].players[i].socketId).emit('game-started',rooms[roomIndex].players[i])
+      }
+
+      // console.log(rooms[0]);
     }
     
   // In this case, the room does not exist. Create it and add this user as the first player...
   } else {
     rooms.push(ChessRoom(socketRoomId, Player(socket.id)))
-    console.log(rooms);
   }
   
 
 
   // Socket events and emits
   socket.on('make-move',data=>{
+    // validation needed here
+
     console.log('make move');
     socket.emit('move-made',data) //sending to the person who submitted the move
     socket.broadcast.emit('move-made',data) //sending to everyone but the sender
