@@ -1,35 +1,25 @@
 var socket = io('http://localhost:3000',{
     query: {
-        roomId:123
+        roomId:123,
+        // landscape:'backend'
     }
 });
 
 socket.on('connection', (socket) => {
     console.log('connected successfully');
-    socket.emit('join-room',roomId)
-    
-    socket.on('chat message', (msg) => {
-        console.log('message: ' + msg);
-    });
-    
-    
     
 });
 
-// probably should just use http headers, not sure how to do it manually yet
-socket.on('202-connected',(token)=>{
-    console.log('Successfully authenticated to the server.');
-    document.cookie = `token=${token}; expires=Sun, 1 Jan 2023 00:00:00 UTC; path=/`
-    console.log(document.cookie);
-    
+socket.on('game-started',data=>{
+    console.log('The game has started, here is your data:',data);
 })
 
-socket.on('poruka',(data)=>{
-    console.log(data);
+socket.on('move-made',data=>{
+    console.log('server-data',data);
 })
 
-socket.on('redirect',(location)=>{
-    window.location.href = location // '/login' is the redirect location upon auth fail
+socket.on('illegal-move',message=>{
+    console.log(message);
 })
 
 socket.on('disconnect',()=>{
@@ -42,11 +32,10 @@ document.querySelector('button').addEventListener('click',()=>{
     
     let data = {
         move: move.value,
-        user: socket.id
+        // user: socket.id
     }
-    console.log(data);
-    move.value = ''
+    console.log('my-data',data);
+    // move.value = ''e
     
-    socket.emit('new-move',data)
+    socket.emit('make-move',data)
 })
-
