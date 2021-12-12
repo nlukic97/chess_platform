@@ -18,6 +18,10 @@ socket.on('move-made',data=>{
     console.log('server-data',data);
 })
 
+socket.on('illegal-move',message=>{
+    console.log(message);
+})
+
 socket.on('disconnect',()=>{
     console.log('You have been disconnected');
 })

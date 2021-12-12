@@ -57,6 +57,12 @@ function GetPieces(){
   }
 }
 
+function switchTurns(roomId){
+  let roomIndex = rooms.findIndex(room=> room.id === roomId)
+  rooms[roomIndex].players[0].playersTurn = !rooms[roomIndex].players[0].playersTurn
+  rooms[roomIndex].players[1].playersTurn = !rooms[roomIndex].players[1].playersTurn
+}
+
 let rooms = []
 
 // let rooms = [
@@ -70,10 +76,10 @@ let rooms = []
 
 io.on('connection', (socket) => {
 
-  socketRoomId = parseInt(socket.handshake.query.roomId)
+  socketRoomId = socket.handshake.query.roomId
   
   // If the user has not submitted a number parameter to join a room, they will be disconnected
-  if(socketRoomId === undefined || isNaN(socketRoomId)){
+  if(socketRoomId === undefined || socketRoomId === null){
     console.log('Disconnecting user - no roomId param found');
     return socket.disconnect()
   }
@@ -131,8 +137,18 @@ io.on('connection', (socket) => {
     // validation needed here
 
     console.log('make move');
-    socket.emit('move-made',data) //sending to the person who submitted the move
-    socket.broadcast.emit('move-made',data) //sending to everyone but the sender
+    let player = rooms.find(room => room.id === socket.handshake.query.roomId).players
+      .find(player=> player.socketId === socket.id)
+
+    if(player.playersTurn === true) {
+      socket.emit('move-made',data) //sending to the person who submitted the move
+      socket.broadcast.emit('move-made',data) //sending to everyone but the sender
+
+      switchTurns(socket.handshake.query.roomId)
+    } else {
+      socket.emit('illegal-move','It is not your turn, or it is an illegal move. This move shall not be registered.')
+    }
+
   })
   
 
