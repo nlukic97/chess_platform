@@ -180,7 +180,17 @@ io.on('connection', (socket) => {
     console.log('make move');
     let roomIndex = rooms.findIndex(room => room.id === submittedRoomId)
     let player = rooms[roomIndex].players.find(player=> player.socketId === socket.id);
-      
+    
+
+
+    /* -----------------------Testing purposes only  - uncomment this, and the chess game works (with no validation on the server, it just shares the payload)----------------------- */
+/*     socket.emit('move-made',data) //sending to the person who submitted the move
+    socket.to(rooms[roomIndex].id).emit('move-made',data) //sending to everyone but the sender in the specific room
+    return */
+    /* ----------------------- Testing purposes only ----------------------- */
+
+
+
     if(player.playersTurn === true) {
       if(validateMove(rooms[roomIndex].chess, data.move)){
 
