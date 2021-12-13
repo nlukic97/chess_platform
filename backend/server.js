@@ -230,12 +230,12 @@ io.on('connection', (socket) => {
         }
       } else {
         console.log('illegal move'); //at this point, we need reset the chessboard to be that of the current state (before the move was made)
-        socket.emit('illegal-move','Error - Illegal move.')
+        socket.emit('illegal-move',['Error - Illegal move.',rooms[roomIndex].chess])
         
       }
     } else {
       console.log('illegal move'); //at this point, we need reset the chessboard to be that of the current state (before the move was made)
-      socket.emit('illegal-move','Error - It is not your turn.')
+      socket.emit('illegal-move',['Error - It is not your turn.',rooms[roomIndex].chess])
     }
     
   })
