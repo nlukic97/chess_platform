@@ -90,14 +90,14 @@ function handleDraw(roomIndex){
 
 let rooms = []
 
-// let rooms = [
-//   {
-//     id:123,
-// players:[],
-// players:[{socketId:'randomSocketId',pieces:undefined, playersTurn:undefined}],
-// players:[{socketId:'randomSocketId',pieces:undefined},{socketId:'random2',pieces:undefined}],
-// }
-// ]
+/* let rooms = [
+  {
+    id:123,
+  players:[],
+  players:[{socketId:'randomSocketId',pieces:undefined, playersTurn:undefined}],
+  players:[{socketId:'randomSocketId',pieces:undefined,playersTurn:undefined},{socketId:'random2',pieces:undefined,playersTurn:undefined}],
+  }
+] */
 
 io.on('connection', (socket) => {
   
@@ -172,6 +172,7 @@ io.on('connection', (socket) => {
   socket.on('make-move',data=>{
     // validation needed here
     
+    
     let submittedRoomId = socket.handshake.query.roomId
     console.log('make move');
     let roomIndex = rooms.findIndex(room => room.id === submittedRoomId)
@@ -182,7 +183,7 @@ io.on('connection', (socket) => {
 
         rooms[roomIndex].chess.move(data.move) //move the piece
         switchTurns(submittedRoomId) //change who's turn it is
-        // socket.emit('move-made',data) //sending to the person who submitted the move
+        socket.emit('move-made',data) //sending to the person who submitted the move
         socket.to(rooms[roomIndex].id).emit('move-made',data) //sending to everyone but the sender in the specific room
 
         // after the switch has been made, we check if the next player is in checkmate
@@ -239,10 +240,10 @@ io.on('connection', (socket) => {
 
 
 // ---------- just for testing purposes ----------
-// app.use(express.static('public'))
-// app.get('/',(req,res)=>{
-//   res.sendFile(__dirname+'/public/index.html')
-// })
+app.use(express.static('public'))
+app.get('/',(req,res)=>{
+  res.sendFile(__dirname+'/public/index.html')
+})
 // ---------- just for testing purposes ----------
 
 

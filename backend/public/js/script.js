@@ -1,4 +1,4 @@
-var socket = io('http://localhost:3000',{
+var socket = io('http://localhost:1234',{
     query: {
         roomId:123,
         // landscape:'backend'
