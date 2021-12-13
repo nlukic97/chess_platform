@@ -1,16 +1,18 @@
 const express = require('express')
 const app = express()
 
-const port = process.env.port || 3000
-// const frontEndUrl = 'http://localhost:3000'
-const frontEndUrl = '*'
+const dotenv = require('dotenv');
+dotenv.config();
+
+const port = process.env.port || 8081
+const corsRules = process.env.cors
 
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 
 const io = new Server(server, {
-  cors: {origin: frontEndUrl} //http://localhost:3000 when developing
+  cors: {origin: corsRules} //http://localhost:3000 when developing
 });
 
 // const { uuid, isUuid } = require('uuidv4');
@@ -40,6 +42,9 @@ function Player(socketId){
  * in order to confirm if the submitted move is possible
  */
 function validateMove(chess,move){
+/*   console.log(move);
+  console.log(chess.moves());
+  console.log(chess.moves().includes(move)) */
   return chess.moves().includes(move);
 }
 
@@ -88,14 +93,14 @@ function handleDraw(roomIndex){
 
 let rooms = []
 
-// let rooms = [
-//   {
-//     id:123,
-// players:[],
-// players:[{socketId:'randomSocketId',pieces:undefined, playersTurn:undefined}],
-// players:[{socketId:'randomSocketId',pieces:undefined},{socketId:'random2',pieces:undefined}],
-// }
-// ]
+/* let rooms = [
+  {
+    id:123,
+  players:[],
+  players:[{socketId:'randomSocketId',pieces:undefined, playersTurn:undefined}],
+  players:[{socketId:'randomSocketId',pieces:undefined,playersTurn:undefined},{socketId:'random2',pieces:undefined,playersTurn:undefined}],
+  }
+] */
 
 io.on('connection', (socket) => {
   
@@ -154,6 +159,7 @@ io.on('connection', (socket) => {
         
         io.to(player.socketId).emit('game-started',payload)
       }
+      console.log(rooms[roomIndex].players);
       
       // console.log(rooms[0]);
     }
@@ -168,18 +174,29 @@ io.on('connection', (socket) => {
   // Socket events and emits
   socket.on('make-move',data=>{
     // validation needed here
+    console.log(data); //the moves are not validated because the data is different
     
     let submittedRoomId = socket.handshake.query.roomId
     console.log('make move');
     let roomIndex = rooms.findIndex(room => room.id === submittedRoomId)
     let player = rooms[roomIndex].players.find(player=> player.socketId === socket.id);
     
+
+
+    /* -----------------------Testing purposes only  - uncomment this, and the chess game works (with no validation on the server, it just shares the payload)----------------------- */
+/*     socket.emit('move-made',data) //sending to the person who submitted the move
+    socket.to(rooms[roomIndex].id).emit('move-made',data) //sending to everyone but the sender in the specific room
+    return */
+    /* ----------------------- Testing purposes only ----------------------- */
+
+
+
     if(player.playersTurn === true) {
       if(validateMove(rooms[roomIndex].chess, data.move)){
 
         rooms[roomIndex].chess.move(data.move) //move the piece
         switchTurns(submittedRoomId) //change who's turn it is
-        // socket.emit('move-made',data) //sending to the person who submitted the move
+        socket.emit('move-made',data) //sending to the person who submitted the move
         socket.to(rooms[roomIndex].id).emit('move-made',data) //sending to everyone but the sender in the specific room
 
         // after the switch has been made, we check if the next player is in checkmate
@@ -236,10 +253,10 @@ io.on('connection', (socket) => {
 
 
 // ---------- just for testing purposes ----------
-app.use(express.static('public'))
+/* app.use(express.static('public'))
 app.get('/',(req,res)=>{
   res.sendFile(__dirname+'/public/index.html')
-})
+}) */
 // ---------- just for testing purposes ----------
 
 
