@@ -45,7 +45,8 @@ function validateMove(chess,move){
 /*   console.log(move);
   console.log(chess.moves());
   console.log(chess.moves().includes(move)) */
-  return chess.moves().includes(move);
+  let moveOutcome = chess.move(move)
+  return (moveOutcome === null) ? false : true;
 }
 
 
@@ -192,9 +193,8 @@ io.on('connection', (socket) => {
 
 
     if(player.playersTurn === true) {
-      if(validateMove(rooms[roomIndex].chess, data.move)){
+      if(validateMove(rooms[roomIndex].chess, data) === true){
 
-        rooms[roomIndex].chess.move(data.move) //move the piece
         switchTurns(submittedRoomId) //change who's turn it is
         socket.emit('move-made',data) //sending to the person who submitted the move
         socket.to(rooms[roomIndex].id).emit('move-made',data) //sending to everyone but the sender in the specific room
@@ -229,10 +229,12 @@ io.on('connection', (socket) => {
           console.log(rooms[roomIndex].players);
         }
       } else {
+        console.log('illegal move'); //at this point, we need reset the chessboard to be that of the current state (before the move was made)
         socket.emit('illegal-move','Error - Illegal move.')
         
       }
     } else {
+      console.log('illegal move'); //at this point, we need reset the chessboard to be that of the current state (before the move was made)
       socket.emit('illegal-move','Error - It is not your turn.')
     }
     
