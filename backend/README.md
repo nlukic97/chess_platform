@@ -46,4 +46,4 @@ Basically, each player is informed which piece they are and who's turn it is (wh
 ----
 # Events to emit from from frontned
 ## 1. make-move
-- this is mostly finished, I just need to make sure what the data being passed to the server looks like for validation
+-  <del>this is mostly finished, I just need to make sure what the data being passed to the server looks like for validation</del>
