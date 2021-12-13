@@ -47,4 +47,4 @@ Basically, each player is informed which piece they are and who's turn it is (wh
 # Events to emit from from frontned
 ## 1. make-move
 -  <del>this is mostly finished, I just need to make sure what the data being passed to the server looks like for validation</del>
-- the last part that still has to be made, there is currently an incompatibility between move registration on the frontend and the backend
+- Backend and frontend are compatible. Now, if a user manages to submit an illegal move to the server, the server must return the board to its original state before the illegal move.
