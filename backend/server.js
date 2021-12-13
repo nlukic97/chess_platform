@@ -1,16 +1,18 @@
 const express = require('express')
 const app = express()
 
-const port = process.env.port || 3000
-// const frontEndUrl = 'http://localhost:3000'
-const frontEndUrl = '*'
+const dotenv = require('dotenv');
+dotenv.config();
+
+const port = process.env.port || 8081
+const corsRules = process.env.cors
 
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 
 const io = new Server(server, {
-  cors: {origin: frontEndUrl} //http://localhost:3000 when developing
+  cors: {origin: corsRules} //http://localhost:3000 when developing
 });
 
 // const { uuid, isUuid } = require('uuidv4');
@@ -152,6 +154,7 @@ io.on('connection', (socket) => {
           playersTurn: player.playersTurn
         };
         
+        console.log(rooms[roomIndex].players);
         io.to(player.socketId).emit('game-started',payload)
       }
       
@@ -236,10 +239,10 @@ io.on('connection', (socket) => {
 
 
 // ---------- just for testing purposes ----------
-app.use(express.static('public'))
-app.get('/',(req,res)=>{
-  res.sendFile(__dirname+'/public/index.html')
-})
+// app.use(express.static('public'))
+// app.get('/',(req,res)=>{
+//   res.sendFile(__dirname+'/public/index.html')
+// })
 // ---------- just for testing purposes ----------
 
 
