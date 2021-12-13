@@ -42,6 +42,9 @@ function Player(socketId){
  * in order to confirm if the submitted move is possible
  */
 function validateMove(chess,move){
+/*   console.log(move);
+  console.log(chess.moves());
+  console.log(chess.moves().includes(move)) */
   return chess.moves().includes(move);
 }
 
@@ -154,9 +157,9 @@ io.on('connection', (socket) => {
           playersTurn: player.playersTurn
         };
         
-        console.log(rooms[roomIndex].players);
         io.to(player.socketId).emit('game-started',payload)
       }
+      console.log(rooms[roomIndex].players);
       
       // console.log(rooms[0]);
     }
@@ -171,13 +174,13 @@ io.on('connection', (socket) => {
   // Socket events and emits
   socket.on('make-move',data=>{
     // validation needed here
-    
+    console.log(data); //the moves are not validated because the data is different
     
     let submittedRoomId = socket.handshake.query.roomId
     console.log('make move');
     let roomIndex = rooms.findIndex(room => room.id === submittedRoomId)
     let player = rooms[roomIndex].players.find(player=> player.socketId === socket.id);
-    
+      
     if(player.playersTurn === true) {
       if(validateMove(rooms[roomIndex].chess, data.move)){
 
@@ -240,10 +243,10 @@ io.on('connection', (socket) => {
 
 
 // ---------- just for testing purposes ----------
-app.use(express.static('public'))
+/* app.use(express.static('public'))
 app.get('/',(req,res)=>{
   res.sendFile(__dirname+'/public/index.html')
-})
+}) */
 // ---------- just for testing purposes ----------
 
 
