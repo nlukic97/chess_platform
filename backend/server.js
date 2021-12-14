@@ -247,6 +247,7 @@ io.on('connection', (socket) => {
 
   /** Chat message */
   socket.on('message-sent',(msg)=>{
+    console.log(msg);
     let room = rooms.find(room=> room.players.some(player=> player.socketId === socket.id)) //returns the room where there is a player with this id
     if(room){
       socket.to(room.id).emit('message-received',msg) //sends the event to all users in the room except the sender (so, to the other player)
