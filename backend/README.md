@@ -48,13 +48,11 @@ Data the 2nd player will receive:
 
 - the data submitted is of an object notation for moves in chess.js
 
-## 4. message-sent
-- When a user emits the event, the server will check which room this user is in, and will emit the event 'message-received' to all the users in the room except the sender.
+## 4. message-received
+- When a user emits the event with 'message-sent', the server will check which room this user is in, and will emit the event 'message-received' to all the users in the room except the sender.
 
-        socket.on('message-sent',(msg)=>{
-            //room.id is found with code not included here
-            socket.to(room.id).emit('message-received',msg) 
-            }
+        socket.on('message-received',(msg)=>{
+            console.log(msg)
         })
 
 # Events to emit from from frontned
