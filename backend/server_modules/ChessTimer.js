@@ -26,9 +26,9 @@ function milisecondsToTime(ms){
 }
 
 
-function StartTimer(){
-    let fullTime = 300000
-    let time = 300000
+function StartTimer(insertedTime){
+    let fullTime = insertedTime
+    let time = insertedTime
 
     let interval = setInterval(()=>{
         time -= 100
