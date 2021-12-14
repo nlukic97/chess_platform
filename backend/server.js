@@ -15,11 +15,10 @@ const io = new Server(server, {
   cors: {origin: corsRules} //http://localhost:3000 when developing
 });
 
-// const { uuid, isUuid } = require('uuidv4');
-
 const path = require('path')
 const { Chess } = require('chess.js'); //for the chess engine
-const { uuid } = require('uuidv4');
+
+const { validate: validateUuid } = require('uuid');
 
 function ChessRoom(roomId, ...players){
   return {
@@ -112,6 +111,12 @@ io.on('connection', (socket) => {
     console.log('Disconnecting user - no roomId param found');
     return socket.disconnect()
   }
+  
+  if(validateUuid(socketRoomId) === false){
+    console.log('Disconnecting user - roomId is not a uuid');
+    return socket.disconnect()
+  }
+
   console.log('connected',socket.id);
   
   socket.join(socketRoomId) //subscribing the user to the room id which they provided
@@ -196,7 +201,7 @@ io.on('connection', (socket) => {
       if(validateMove(rooms[roomIndex].chess, data) === true){
 
         switchTurns(submittedRoomId) //change who's turn it is
-        socket.emit('move-made',data) //sending to the person who submitted the move
+        socket.emit('move-valid',{valid:true, chess: rooms[roomIndex].chess}) //sending to the person who submitted the move  ----> move-valid
         socket.to(rooms[roomIndex].id).emit('move-made',data) //sending to everyone but the sender in the specific room
 
         // after the switch has been made, we check if the next player is in checkmate
@@ -230,14 +235,22 @@ io.on('connection', (socket) => {
         }
       } else {
         console.log('illegal move'); //at this point, we need reset the chessboard to be that of the current state (before the move was made)
-        socket.emit('illegal-move',['Error - Illegal move.',rooms[roomIndex].chess])
+        socket.emit('move-valid',{valid:false, chess: rooms[roomIndex].chess}) //mode-valid, false
         
       }
     } else {
       console.log('illegal move'); //at this point, we need reset the chessboard to be that of the current state (before the move was made)
-      socket.emit('illegal-move',['Error - It is not your turn.',rooms[roomIndex].chess])
+      socket.emit('move-valid',{valid:false, chess: rooms[roomIndex].chess}) //mode-valid, false
     }
     
+  })
+
+  /** Chat message */
+  socket.on('message-sent',(msg)=>{
+    let room = rooms.find(room=> room.players.some(player=> player.socketId === socket.id)) //returns the room where there is a player with this id
+    if(room){
+      socket.to(room.id).emit('message-received',msg) //sends the event to all users in the room except the sender (so, to the other player)
+    }
   })
   
   

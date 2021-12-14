@@ -1,5 +1,11 @@
 # Events to listen for in the frontend
 ## 1. game-started
+- When two users join a room, this will be emited. 
+- Clientside listener:
+    
+        socket.on('game-started', data=>{
+            console.log(data)
+        })
 
 Data 1 player will receive:
 
@@ -14,36 +20,43 @@ Data the 2nd player will receive:
             pieces:'black',
             playersTurn: false
         }
----
-Basically, each player is informed which piece they are and who's turn it is (white will understandably have the first turn). This info should be used to update the chessboard position, and ability to move pieces.
 
-### Event listener for frontned:
-
-
-            socket.on('game-started', data=>{
-                console.log(data)
-            })
-
+- Basically, each player is informed which piece they are and who's turn it is (white will understandably have the first turn). This info should be used to update the chessboard position, and ability to move pieces.
 
 ---
 
-## 2. move-made
-- When one user emits the 'make-move' event, the server will emit the 'move-made' event to both users (may need to change data being passed down to include who's turn it is so the frontend can update it).
+## 2. move-valid
+- When a user submits a move, if it is valid, the server will emit 'move-made' to the user who sent the move. 
+- Listener on the frontend:
+
+        socket.on('move-valid', data=>{
+            console.log(data) 
+        })
+- The data returned will be an object like this:  
+        
+        {
+            valid:false,  //or true
+            chess: chess //the valid chess object saved to the server
+        }
+
+## 3. move-made
+- When a user submits a move, if it is valid, the other user in the room will be informed about which move it is with the emit 'move-made'.
 
         socket.on('move-made', data=>{
             console.log(data)
         })
 
+- the data submitted is of an object notation for moves in chess.js
 
-----
+## 4. message-sent
+- When a user emits the event, the server will check which room this user is in, and will emit the event 'message-received' to all the users in the room except the sender.
 
-## 3. illegal-move
-- If a user makes a move when it is not their turn, or try to submit an illegal move, the server will emit this event informing the user who made the submission that the move is not permitted and will not be registered.
-
-        socket.on('illegal-move',data=>{
-            console.log(data); //output: [message, chessboard state];
+        socket.on('message-sent',(msg)=>{
+            //room.id is found with code not included here
+            socket.to(room.id).emit('message-received',msg) 
+            }
         })
-----
+
 # Events to emit from from frontned
 ## 1. make-move
 -  <del>this is mostly finished, I just need to make sure what the data being passed to the server looks like for validation</del>
