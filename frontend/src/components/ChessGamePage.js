@@ -50,9 +50,9 @@ export function ChessGamePage() {
         })
         socket.on("game-started", ({pieces, playersTurn, initialPosition}) => {
             console.log("game-started");
-            setGameData({pieces, playersTurn})
+            setGameData({pieces, playersTurn, initialPosition})
             setGameStarted(true)
-            console.log("{pieces, playersTurn} STATE", {pieces, playersTurn, initialPosition})
+            console.log("{pieces, playersTurn, initialPosition} STATE", {pieces, playersTurn, initialPosition})
         })
         return () => {
             socket.off("game-started")
