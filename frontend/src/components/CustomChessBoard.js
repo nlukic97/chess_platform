@@ -1,10 +1,11 @@
-import {useContext, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import Chess from 'chess.js';
 import {Chessboard} from 'react-chessboard';
 import {useSocket} from "../contexts/SocketProvider";
 
 export default function CustomChessBoard({pieces, playersTurn, initialPosition}) {
-    const [game, setGame] = useState(initialPosition || new Chess());
+    console.log("initialPosition", initialPosition);
+    const [game, setGame] = useState(initialPosition ? new Chess(initialPosition) : new Chess());
     const [playerColor,] = useState(pieces)
     const [isMyTurn, setIsMyTurn] = useState(playersTurn)
     const {socket} = useSocket()
@@ -41,6 +42,21 @@ export default function CustomChessBoard({pieces, playersTurn, initialPosition})
             })
             setIsMyTurn(true)
             console.log(move);
+        })
+        socket.on("game-over", (msg) => {
+            // safeGameMutate((game) => {
+            //     game.move(move);
+            // });
+            // console.log("move-made");
+            // console.log(move);
+            // setGame(g => {
+            //     const gameCopy = {...g};
+            //     gameCopy.move(move)
+            //     return gameCopy
+            // })
+            console.log(msg);
+            // setIsMyTurn(true)
+            // console.log(move);
         })
         return () => {
             socket.off("make-move")
