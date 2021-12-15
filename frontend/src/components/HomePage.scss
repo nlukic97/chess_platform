@@ -1,0 +1,38 @@
+.game-id-form {
+  min-height: 100px;
+  min-width: 350px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  box-shadow: 0 7px 32px 5px rgba(0, 0, 0, 0.3);
+  padding: 24px;
+
+  .input-wrapper {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+
+    label {
+      //text-align: right;
+    }
+
+    input {
+      box-sizing: border-box;
+      min-width: 100%;
+      padding: 5px;
+      //width: 100%;
+    }
+  }
+
+  .btn-wrapper {
+    flex-basis: 50px;
+
+    button {
+      width: 100%;
+      padding: 10px;
+    }
+  }
+}

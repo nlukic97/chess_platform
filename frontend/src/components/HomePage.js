@@ -1,19 +1,21 @@
 import {v4 as uuidv4} from 'uuid';
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
+import "./HomePage.scss"
+import GeneralInfo from "./GeneralInfo";
+import JoinARoomModal from "./JoinARoomModal";
 
 export function HomePage() {
 
     const navigate = useNavigate()
     const [showModal, setShowModal] = useState(false)
-    const [uuidInputed, setUuidInputed] = useState("")
 
     function handleCreateARoom() {
         const roomUuid = uuidv4()
         navigate(`/${roomUuid}`)
     }
 
-    function handleJoinARoom(){
+    function handleJoinARoom() {
         console.log("join a room");
         setShowModal(true)
     }
@@ -27,10 +29,8 @@ export function HomePage() {
             <button onClick={handleJoinARoom}>
                 Join a room
             </button>
-            <div>
-                <input type="text" value={uuidInputed} onChange={e => setUuidInputed(e.target.value)}/>
-                <button onClick={navigate(`/${uuidInputed}`)}>Dzojn</button>
-            </div>
+            {showModal && <JoinARoomModal closeModal={() => setShowModal(false)}/>}
+            <GeneralInfo/>
         </div>
     )
 }

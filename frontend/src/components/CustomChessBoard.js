@@ -1,10 +1,10 @@
 import {useContext, useEffect, useState} from 'react';
 import Chess from 'chess.js';
 import {Chessboard} from 'react-chessboard';
-import {SocketContext, useSocket} from "../contexts/SocketProvider";
+import {useSocket} from "../contexts/SocketProvider";
 
-export default function CustomChessBoard({pieces, playersTurn}) {
-    const [game, setGame] = useState(new Chess());
+export default function CustomChessBoard({pieces, playersTurn, initialPosition}) {
+    const [game, setGame] = useState(initialPosition || new Chess());
     const [playerColor,] = useState(pieces)
     const [isMyTurn, setIsMyTurn] = useState(playersTurn)
     const {socket} = useSocket()
@@ -16,12 +16,6 @@ export default function CustomChessBoard({pieces, playersTurn}) {
     useEffect(() => {
         console.log(socket);
         if (!socket) return
-        // socket.on("game-started", ({pieces, playersTurn}) => {
-        //     console.log("game-started");
-        //     console.log({pieces, playersTurn})
-        //     setPlayerColor(pieces)
-        //     setIsMyTurn(playersTurn)
-        // })
         socket.on("move-valid", ({valid, chess}) => {
             // safeGameMutate((game) => {
             //     game.move(move);
@@ -68,6 +62,7 @@ export default function CustomChessBoard({pieces, playersTurn}) {
 
     function onDrop(sourceSquare, targetSquare) {
         let move = null;
+        // if(game.turn() !== playerColor[0].toLowerCase()) return
         safeGameMutate((game) => {
             move = game.move({
                 from: sourceSquare,
