@@ -158,6 +158,8 @@ io.on('connection', (socket) => {
       console.log('Two players are in the game, start it !');
       
       rooms[roomIndex].chess = new Chess()
+
+      //stalemate fen: '8/8/8/8/8/4k3/3p4/4K3 w - - 0 2'
       
       /**  for testing purposes */
       // rooms[roomIndex].chess = new Chess('r2k1bnr/ppp1pppp/8/1B6/3P2Q1/N7/nP1P1PPP/R1B1K1NR w KQ - 0 9');
@@ -173,7 +175,7 @@ io.on('connection', (socket) => {
         let payload = {
           pieces: player.pieces, 
           playersTurn: player.playersTurn,
-          initialPosition: rooms[roomIndex].chess
+          initialPosition: rooms[roomIndex].chess.fen()
         };
         
         io.to(player.socketId).emit('game-started',payload)
@@ -229,10 +231,10 @@ io.on('connection', (socket) => {
             io.in(rooms[roomIndex].id).emit('game-over',outcome)
 
             // specific draw situations  
-          } else if(rooms[roomIndex].in_stalemate()){ // stalemate
+          } else if(rooms[roomIndex].chess.in_stalemate()){ // stalemate
             io.in(rooms[roomIndex].id).emit('game-over',GameOutcome('stalemate'))
             
-          } else if(rooms[roomIndex].in_threefold_repetition()){ // threefold_repetition
+          } else if(rooms[roomIndex].chess.in_threefold_repetition()){ // threefold_repetition
             io.in(rooms[roomIndex].id).emit('game-over',GameOutcome('threefold-repetition'))
           
           } else if(rooms[roomIndex].chess.in_draw()){
