@@ -1,13 +1,28 @@
 import CustomChessBoard from "./CustomChessBoard";
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {useSocket} from "../contexts/SocketProvider";
 import Chat from "./Chat";
 import "./ChessGamePage.scss"
+import Modal from "./Modal";
 
 const ConnectingLoader = () => (
-    <div className="connecting-loader-wrapper">
-        <div className="loader-spinner" />
+    <Modal>
+        <div className="loader-spinner"/>
+    </Modal>
+)
+
+const RoomLink = ({roomID}) => (
+    <div>
+        <div>Share the room ID or send the link to your friend!</div>
+        <div>
+            <div>Room ID</div>
+            {roomID}
+        </div>
+        {/*<div>*/}
+        {/*    <div>Direct link</div>*/}
+        {/*    <div>{`${window.location.href}`}</div>*/}
+        {/*</div>*/}
     </div>
 )
 
@@ -25,7 +40,7 @@ export function ChessGamePage() {
 
     useEffect(() => {
         console.log("socket useEffect");
-        if(!socket) {
+        if (!socket) {
             console.log("not connected");
             return
         }
@@ -33,11 +48,11 @@ export function ChessGamePage() {
             console.log("connected");
             setIsConnected(true)
         })
-        socket.on("game-started", ({pieces, playersTurn}) => {
+        socket.on("game-started", ({pieces, playersTurn, initialPosition}) => {
             console.log("game-started");
             setGameData({pieces, playersTurn})
             setGameStarted(true)
-            console.log("{pieces, playersTurn} STATE", {pieces, playersTurn})
+            console.log("{pieces, playersTurn} STATE", {pieces, playersTurn, initialPosition})
         })
         return () => {
             socket.off("game-started")
@@ -47,15 +62,15 @@ export function ChessGamePage() {
     return (
         <div>
             <h1>ChessGamePage</h1>
-            {
-                !isConnected ? <div className="connecting-loader">Connecting...</div> :
-                gameStarted ?
+            {!isConnected && <ConnectingLoader/>}
+            {isConnected && gameStarted ? (
                 <div className="game-chat-container">
                     <CustomChessBoard {...gameData} />
                     <Chat/>
                 </div>
-                : <h1>Waiting for the game to start</h1>
-            }
+            ) : (
+                <RoomLink roomID={uuid} />
+            )}
         </div>
     );
 }

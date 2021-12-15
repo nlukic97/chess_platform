@@ -19,11 +19,18 @@ const Chat = () => {
     }, [socket])
 
     function sendMessage() {
+        if (messageInput.trim() === "") return
         console.log(messageInput);
         console.log("message-sent");
         setMessages(oldMsgs => [...oldMsgs, {msg: `me: ${messageInput}`, timestamp: new Date().getTime()}])
         socket.emit("message-sent", messageInput)
         setMessageInput("")
+    }
+
+    function handleKeyPress(e) {
+        if (e.key === "Enter") {
+            sendMessage()
+        }
     }
 
     console.log("rerender chat");
@@ -34,7 +41,7 @@ const Chat = () => {
                 {messages.map(msg => <div key={msg.timestamp}>{msg.msg}</div>)}
             </div>
             <div className="message-input">
-                <input type="text" value={messageInput} onChange={e => setMessageInput(e.target.value)} />
+                <input type="text" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={handleKeyPress} />
                 <button onClick={sendMessage}>Send Message!</button>
             </div>
         </div>
