@@ -1,22 +1,34 @@
-import React, {createContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import {io} from "socket.io-client";
 
 export const SocketContext = createContext()
+export const useSocket = () => useContext(SocketContext)
 
 const SocketProvider = ({children}) => {
 
     const [socket, setSocket] = useState(null)
+    const [connectionError, setConnectionError] = useState(false)
 
-    useEffect(()=> {
-        setSocket(io(process.env.REACT_APP_SERVER_ADDRESS,{
+    const connect = roomId => {
+        const socketConnection = io(process.env.REACT_APP_SERVER_ADDRESS, {
             query: {
-                roomId:123
+                roomId
             }
-        }))
-    },[])
+        })
+        // socketConnection.on()
+        setSocket(socketConnection)
+    }
+
+    useEffect(() => {
+        console.log("SocketProvider alive");
+    }, [])
+
+    useEffect(() => {
+        console.log(`SocketProvider ${socket}`);
+    }, [socket])
 
     return (
-        <SocketContext.Provider value={{socket}}>
+        <SocketContext.Provider value={{socket, connect}}>
             {children}
         </SocketContext.Provider>
     );

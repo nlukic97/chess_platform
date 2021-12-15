@@ -1,0 +1,16 @@
+.messages-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-height: 100vh;
+
+  .message-input {
+    background-color: red;
+  }
+
+  .messages-container {
+    //height: 100px;
+    flex: 1;
+    background-color: antiquewhite;
+  }
+}
