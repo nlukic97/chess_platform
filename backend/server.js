@@ -36,6 +36,14 @@ function Player(socketId){
   }
 }
 
+function GameOutcome(reason = undefined,winner = undefined,loser=undefined){
+  return {
+    reason,
+    winner,
+    loser
+  }
+}
+
 /**checks if the submitted move is amongs the possible moves.
  * Takes a chess (object from within a room) and a move(string)
  * in order to confirm if the submitted move is possible
@@ -78,17 +86,21 @@ function switchTurns(roomId){
 }
 
 function handleCheckmate(roomIndex){
-  rooms[roomIndex].players.forEach(player=>{
-    if(player.playersTurn === true){
-      console.log(`${player.pieces} has lost the game due to checkmate.`);
-    } else if(player.playersTurn === false){
-      console.log(`${player.pieces} has won the game with a checkmate.`);
-    }
-  })
+  let winner = rooms[roomIndex].players.find(player=> player.playersTurn === false).pieces
+  let loser = rooms[roomIndex].players.find(player=> player.playersTurn === true).pieces
+  
+  // rooms[roomIndex].players.forEach(player=>{
+  //   if(player.playersTurn === true){
+  //     console.log(`${player.pieces} has lost the game due to checkmate.`);
+  //   } else if(player.playersTurn === false){
+  //     console.log(`${player.pieces} has won the game with a checkmate.`);
+  //   }
+  // })
+  return GameOutcome('checkmate',winner,loser)
 }
 
-function handleDraw(roomIndex){
-  console.log('There is a draw');
+function findRoom(socketId){
+  return rooms.find(room=> room.players.some(player=> player.socketId === socketId))
 }
 
 let rooms = []
@@ -160,7 +172,8 @@ io.on('connection', (socket) => {
         let player = rooms[roomIndex].players[i];
         let payload = {
           pieces: player.pieces, 
-          playersTurn: player.playersTurn
+          playersTurn: player.playersTurn,
+          initialPosition: rooms[roomIndex].chess
         };
         
         io.to(player.socketId).emit('game-started',payload)
@@ -210,21 +223,23 @@ io.on('connection', (socket) => {
 
           // due to checkmate
           if(rooms[roomIndex].chess.in_checkmate()){
-            handleCheckmate(roomIndex)
+            
+            // sending the game outcome to all clients
+            let outcome = handleCheckmate(roomIndex)
+            io.in(rooms[roomIndex].id).emit('game-over',outcome)
 
-            // due to draw
+            // specific draw situations  
+          } else if(rooms[roomIndex].in_stalemate()){ // stalemate
+            io.in(rooms[roomIndex].id).emit('game-over',GameOutcome('stalemate'))
+            
+          } else if(rooms[roomIndex].in_threefold_repetition()){ // threefold_repetition
+            io.in(rooms[roomIndex].id).emit('game-over',GameOutcome('threefold-repetition'))
+          
           } else if(rooms[roomIndex].chess.in_draw()){
-            handleDraw(roomIndex)
-
-            // stalemate
-          } else if(rooms[roomIndex].in_stalemate()){
-            console.log('Stalemate draw');
-
-            // threefold_repetition
-          } else if(rooms[roomIndex].in_threefold_repetition()){
-            console.log('threefold repetition draw');
-          } else {
-            console.log('Other reason for the game to be over');
+            io.in(rooms[roomIndex].id).emit('game-over',GameOutcome('draw'))
+            
+          } else { // other reason for game to be over
+            io.in(rooms[roomIndex].id).emit('game-over',GameOutcome('other'))
           }
 
           for(let i = 0; i <= 1; i++){
@@ -248,7 +263,7 @@ io.on('connection', (socket) => {
   /** Chat message */
   socket.on('message-sent',(msg)=>{
     console.log(msg);
-    let room = rooms.find(room=> room.players.some(player=> player.socketId === socket.id)) //returns the room where there is a player with this id
+    let room = findRoom(socket.id) //returns the room where there is a player with this id
     if(room){
       socket.to(room.id).emit('message-received',{msg:msg, timestamp: new Date().getTime()}) //sends the event to all users in the room except the sender (so, to the other player)
     }
@@ -258,7 +273,14 @@ io.on('connection', (socket) => {
   // When a user leaves ...
   socket.on('disconnect',()=>{
     console.log('user has disconnected');
-    
+
+    let room = findRoom(socket.id)
+
+    // if the game has already started, remove the player emmit to the other player that the game is over due to player disconnection
+    if(room.chess !== undefined){
+      socket.to(room.id).emit('game-over',GameOutcome('player-disconnected'))
+    }
+
     // remove the player from the room, and remove this room if there are no players left
     rooms = rooms.map(room=> {
       room.players = room.players.filter(player=> player.socketId !== socket.id)
