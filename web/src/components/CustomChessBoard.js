@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import Chess from 'chess.js';
 import {Chessboard} from 'react-chessboard';
 import {useSocket} from "../contexts/SocketProvider";
+import "./CustomChessBoard.scss"
 
 export default function CustomChessBoard({pieces, playersTurn, initialPosition}) {
     console.log("initialPosition", initialPosition);
@@ -18,21 +19,15 @@ export default function CustomChessBoard({pieces, playersTurn, initialPosition})
         console.log(socket);
         if (!socket) return
         socket.on("move-valid", ({valid, chess}) => {
-            // safeGameMutate((game) => {
-            //     game.move(move);
-            // });
             console.log("move-valid");
-            if (valid) setIsMyTurn(false)
-            else {
-                setGame(chess)
-                alert("1337 haxx0r")
+            if (!valid) {
+                console.log("chess:", chess);
+                console.log("MOVE IS INVALID");
+                setGame(new Chess(chess))
             }
             console.log(valid, chess);
         })
         socket.on("move-made", (move) => {
-            // safeGameMutate((game) => {
-            //     game.move(move);
-            // });
             console.log("move-made");
             console.log(move);
             setGame(g => {
@@ -44,19 +39,8 @@ export default function CustomChessBoard({pieces, playersTurn, initialPosition})
             console.log(move);
         })
         socket.on("game-over", (msg) => {
-            // safeGameMutate((game) => {
-            //     game.move(move);
-            // });
-            // console.log("move-made");
-            // console.log(move);
-            // setGame(g => {
-            //     const gameCopy = {...g};
-            //     gameCopy.move(move)
-            //     return gameCopy
-            // })
             console.log(msg);
-            // setIsMyTurn(true)
-            // console.log(move);
+            alert(msg)
         })
         return () => {
             socket.off("make-move")
@@ -78,23 +62,20 @@ export default function CustomChessBoard({pieces, playersTurn, initialPosition})
 
     function onDrop(sourceSquare, targetSquare) {
         let move = null;
-        // if(game.turn() !== playerColor[0].toLowerCase()) return
+        if(game.turn() !== playerColor[0].toLowerCase()) return
         safeGameMutate((game) => {
             move = game.move({
                 from: sourceSquare,
                 to: targetSquare,
-                promotion: 'q' // always promote to a queen for example simplicity
+                // TODO: add premove
+                promotion: 'q'
             });
-            // console.log(move);
-            // setTimeout(makeRandomMove, 200);
-            // conn.emit("make-move", {move: algebraicMove})
-            // console.log(objToAlgebraic({}));
         });
-        if (move === null) return false; // illegal move
+        if (move === null) return false;
         socket.emit("make-move", {
             from: sourceSquare,
             to: targetSquare,
-            promotion: 'q' // always promote to a queen for example simplicity
+            promotion: 'q' // TODO: add premove
         })
         return true;
     }
@@ -102,14 +83,12 @@ export default function CustomChessBoard({pieces, playersTurn, initialPosition})
     // const fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"
 
     return (
-        <div>
-            <h1>{game.turn()}</h1>
-            <h1>{JSON.stringify(game.header())}</h1>
+        <div className="CustomChessBoard">
             <Chessboard
                 position={game.fen()}
                 areArrowsAllowed={true}
-                arePiecesDraggable={isMyTurn}
-                arePremovesAllowed={false}
+                // arePiecesDraggable={isMyTurn}
+                arePremovesAllowed={true}
                 animationDuration={100}
                 boardOrientation={playerColor}
                 boardWidth={500}

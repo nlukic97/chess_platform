@@ -7,7 +7,6 @@ export const useSocket = () => useContext(SocketContext)
 const SocketProvider = ({children}) => {
 
     const [socket, setSocket] = useState(null)
-    const [connectionError, setConnectionError] = useState(false)
 
     const connect = roomId => {
         const socketConnection = io(process.env.REACT_APP_SERVER_ADDRESS, {
@@ -15,7 +14,6 @@ const SocketProvider = ({children}) => {
                 roomId
             }
         })
-        // socketConnection.on()
         setSocket(socketConnection)
     }
 

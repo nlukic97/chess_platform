@@ -1,0 +1,29 @@
+html, body {
+  margin: 0;
+  background-color: #f1f1f1;
+}
+
+* {
+  font-family: Arial, serif;
+}
+
+input {
+  padding: 10px;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  background-color: #f6f6f6;
+  font-family: Arial, serif;
+  min-width: 0;
+  font-size: 15px;
+}
+
+button {
+  background-color: #111111;
+  color: #f1f1f1;
+  font-weight: bold;
+  padding: 10px;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}

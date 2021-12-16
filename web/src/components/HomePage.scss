@@ -1,0 +1,12 @@
+.HomePage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .content-wrapper {
+    max-width: 720px;
+    button {
+      margin-top: 10px;
+    }
+  }
+}
