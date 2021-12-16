@@ -11,17 +11,19 @@ Data 1 player will receive:
 
         {
             pieces:'white',
-            playersTurn: true
+            playersTurn: true,
+            initialPosition: ChessboardObject
         }
 
 Data the 2nd player will receive:
 
         {
             pieces:'black',
-            playersTurn: false
+            playersTurn: false,
+            initialPosition: ChessboardObject
         }
 
-- Basically, each player is informed which piece they are and who's turn it is (white will understandably have the first turn). This info should be used to update the chessboard position, and ability to move pieces.
+- Basically, each player is informed which piece they are and who's turn it is (white will understandably have the first turn) allong with the initial setup for the board. All this info should be used to initialize the chessboard on the client, update the chessboard position/orientation, and ability to move pieces.
 
 ---
 
@@ -55,7 +57,24 @@ Data the 2nd player will receive:
             console.log(msg)
         })
 
+## 5. game-over
+- When the game is over, this event will be emmited to users who are in the room. The data sent to the clients will look as so:
+            
+        {
+            reason: 'checkmate',
+            winner: 'white',
+            loser: 'black'
+        }
+
+- If the reason for the game ending is a 'draw', 'stalemate', 'threefold-repetition', 'player-disconnected', or 'other',then the data sent to the users will look like this (winner and loser are only sent when a player has won the against the other):
+
+        {
+            reason: 'disconnected'
+        }
+---
 # Events to emit from from frontned
+
+
 ## 1. make-move
 -  <del>this is mostly finished, I just need to make sure what the data being passed to the server looks like for validation</del>
 - Backend and frontend are compatible. Now, if a user manages to submit an illegal move to the server, the server must return the board to its original state before the illegal move.
