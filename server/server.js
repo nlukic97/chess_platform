@@ -4,8 +4,8 @@ const app = express()
 const dotenv = require('dotenv');
 dotenv.config();
 
-const port = process.env.port || 8081
-const corsRules = process.env.cors
+const port = process.env.PORT || 8081
+const corsRules = process.env.CORS
 
 const http = require('http');
 const server = http.createServer(app);
