@@ -21,16 +21,23 @@ export function HomePage() {
     }
 
     return (
-        <div>
-            <h1>HomePage</h1>
-            <button onClick={handleCreateARoom}>
-                Create a room
-            </button>
-            <button onClick={handleJoinARoom}>
-                Join a room
-            </button>
-            {showModal && <JoinARoomModal closeModal={() => setShowModal(false)}/>}
-            <GeneralInfo/>
+        <div className="HomePage">
+            <div className="content-wrapper">
+                <h1>Epic Multiplayer Chess</h1>
+                <div>Actions:</div>
+                <div>
+                    <button onClick={handleCreateARoom}>
+                        Create a room
+                    </button>
+                </div>
+                <div>
+                    <button onClick={handleJoinARoom}>
+                        Join a room
+                    </button>
+                </div>
+                {showModal && <JoinARoomModal closeModal={() => setShowModal(false)}/>}
+                <GeneralInfo/>
+            </div>
         </div>
     )
 }

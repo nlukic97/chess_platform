@@ -2,15 +2,38 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  max-height: 100vh;
+  word-break: break-all;
+  max-height: 500px;
+  width: 300px;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 7px 31px 5px rgba(0, 0, 0, 0.51);
 
-  .message-input {
+  .chat-form {
+    // TODO: Ako vidis ovo onda nesto ne valja
     background-color: red;
+    display: flex;
+    justify-content: space-between;
+
+    input {
+      flex: 1;
+    }
+
+    button {
+      flex-basis: 50px;
+    }
   }
 
   .messages-container {
     flex: 1;
-    background-color: antiquewhite;
+    padding: 24px;
+    margin-bottom: 5px;
+    overflow: auto;
+    color: #111;
+
+    .message {
+      padding: 3px 2px;
+    }
   }
 
   @media screen and (max-width: 768px) {

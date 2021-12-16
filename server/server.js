@@ -201,7 +201,7 @@ io.on('connection', (socket) => {
       if(validateMove(rooms[roomIndex].chess, data) === true){
 
         switchTurns(submittedRoomId) //change who's turn it is
-        socket.emit('move-valid',{valid:true, chess: rooms[roomIndex].chess}) //sending to the person who submitted the move  ----> move-valid
+        socket.emit('move-valid',{valid:true, chess: rooms[roomIndex].chess.fen()}) //sending to the person who submitted the move  ----> move-valid
         socket.to(rooms[roomIndex].id).emit('move-made',data) //sending to everyone but the sender in the specific room
 
         // after the switch has been made, we check if the next player is in checkmate
@@ -235,12 +235,12 @@ io.on('connection', (socket) => {
         }
       } else {
         console.log('illegal move'); //at this point, we need reset the chessboard to be that of the current state (before the move was made)
-        socket.emit('move-valid',{valid:false, chess: rooms[roomIndex].chess}) //mode-valid, false
+        socket.emit('move-valid',{valid:false, chess: rooms[roomIndex].chess.fen()}) //mode-valid, false
         
       }
     } else {
       console.log('illegal move'); //at this point, we need reset the chessboard to be that of the current state (before the move was made)
-      socket.emit('move-valid',{valid:false, chess: rooms[roomIndex].chess}) //mode-valid, false
+      socket.emit('move-valid',{valid:false, chess: rooms[roomIndex].chess.fen()}) //mode-valid, false
     }
     
   })

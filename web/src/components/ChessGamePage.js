@@ -13,17 +13,28 @@ const ConnectingLoader = () => (
 )
 
 const RoomLink = ({roomID}) => (
-    <div>
-        <div>Share the room ID or send the link to your friend!</div>
-        <div>
-            <div>Room ID</div>
-            {roomID}
+    <Modal>
+        <div className="waiting-room">
+            <div>Share the room ID or send the link to your friend!</div>
+            <div>
+                <div className="label">Room ID:</div>
+                <div className="room-id-wrapper">
+                    <div className="room-id-label">{roomID}</div>
+                    <button onClick={() => navigator.clipboard.writeText(roomID)}>Copy to Clipboard!</button>
+                </div>
+            </div>
+            <div>
+                <div>Direct link:</div>
+                <div className="room-id-wrapper">
+                    <div className="room-id-label">{`${window.location.href}`}</div>
+                    <button onClick={() => navigator.clipboard.writeText(window.location.href)}>Copy to Clipboard!</button>
+                </div>
+            </div>
+            <div>
+                Waiting for the opponent to join...
+            </div>
         </div>
-        {/*<div>*/}
-        {/*    <div>Direct link</div>*/}
-        {/*    <div>{`${window.location.href}`}</div>*/}
-        {/*</div>*/}
-    </div>
+    </Modal>
 )
 
 export function ChessGamePage() {
@@ -61,15 +72,14 @@ export function ChessGamePage() {
 
     return (
         <div>
-            <h1>ChessGamePage</h1>
             {!isConnected && <ConnectingLoader/>}
             {isConnected && gameStarted ? (
-                <div className="game-chat-container">
+                <div className="game-chat-wrapper">
                     <CustomChessBoard {...gameData} />
                     <Chat/>
                 </div>
             ) : (
-                <RoomLink roomID={uuid} />
+                <RoomLink roomID={uuid}/>
             )}
         </div>
     );
