@@ -37,7 +37,7 @@ const RoomLink = ({roomID}) => (
     </Modal>
 )
 
-export function ChessGamePage() {
+export function ChessGamePage({fen = false}) {
 
     const {uuid} = useParams()
     const {socket, connect} = useSocket()
@@ -46,7 +46,11 @@ export function ChessGamePage() {
     const [gameData, setGameData] = useState({})
 
     useEffect(() => {
-        connect(uuid)
+        const connectionParams = {roomId: uuid}
+        if(fen) {
+            connectionParams.fen = fen
+        }
+        connect(connectionParams)
     }, [])
 
     useEffect(() => {

@@ -4,11 +4,15 @@ import {useState} from "react";
 import "./HomePage.scss"
 import GeneralInfo from "./GeneralInfo";
 import JoinARoomModal from "./JoinARoomModal";
+import SetFENModal from "./SetFENModal";
+import Modal from "./Modal";
 
-export function HomePage() {
+export function HomePage({fen, setFen}) {
 
     const navigate = useNavigate()
-    const [showModal, setShowModal] = useState(false)
+    const [showJoinModal, setShowJoinModal] = useState(false)
+    const [showFENModal, setShowFENModal] = useState(false)
+    const [showFischerRandomModal, setShowFischerRandomModal] = useState(false)
 
     function handleCreateARoom() {
         const roomUuid = uuidv4()
@@ -17,7 +21,16 @@ export function HomePage() {
 
     function handleJoinARoom() {
         console.log("join a room");
-        setShowModal(true)
+        setShowJoinModal(true)
+    }
+
+    function handleFischerRandom() {
+        setShowFischerRandomModal(true)
+    }
+
+    function handleCustomFEN() {
+        console.log("join a room");
+        setShowFENModal(true)
     }
 
     return (
@@ -35,7 +48,19 @@ export function HomePage() {
                         Join a room
                     </button>
                 </div>
-                {showModal && <JoinARoomModal closeModal={() => setShowModal(false)}/>}
+                <div>
+                    <button onClick={handleFischerRandom}>
+                        Create a Fischer Random room
+                    </button>
+                </div>
+                <div>
+                    <button onClick={handleCustomFEN}>
+                        Create a custom room using FEN
+                    </button>
+                </div>
+                {showJoinModal && <JoinARoomModal closeModal={() => setShowJoinModal(false)}/>}
+                {showFENModal && <SetFENModal action={handleCreateARoom} fen={fen} setFen={setFen} closeModal={() => setShowFENModal(false)}/>}
+                {showFischerRandomModal && <Modal><h1 onClick={() => setShowFischerRandomModal(false)}>Coming soon</h1></Modal>}
                 <GeneralInfo/>
             </div>
         </div>

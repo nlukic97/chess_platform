@@ -17,6 +17,17 @@
     flex-direction: column;
   }
 
+  .FEN {
+    width: 320px;
+  }
+
+  span {
+    color: red;
+    font-size: 12px;
+    padding: 4px;
+    font-weight: bold;
+  }
+
   .btn-wrapper {
     flex-basis: 50px;
   }

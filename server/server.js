@@ -17,14 +17,16 @@ const io = new Server(server, {
 
 const path = require('path')
 const { Chess } = require('chess.js'); //for the chess engine
+const validateFEN = require('fen-validator').default;
 
 const { validate: validateUuid } = require('uuid');
 
-function ChessRoom(roomId, ...players){
+function ChessRoom(roomId, fen = undefined, ...players){
   return {
     id: roomId,
     players: players,
-    chess:undefined
+    chess: undefined,
+    fen:fen
   }
 }
 
@@ -56,24 +58,34 @@ function validateMove(chess,move){
   return (moveOutcome === null) ? false : true;
 }
 
+function fullFenValidation(fen){
+  if(typeof(fen) !== 'string'){
+      return false
+  } else {
+      return validateFEN(fen)
+  }
+}
+
 
 /**
 * Returns an array of objects.
 * Each object contains data to be assigned to players who are about to start a game.
 * The data is: which piece the player is, and if it's their turn. ('white' pieces go first, so the turn will be 'true')
 * */
-function GetPieces(){
+function GetPieces(turn){
+
   let randNum = Math.floor(Math.random() * (2 - 0) + 0); // 0 or 1
-  
+
+
   if(randNum === 0){
     return [
-      {assignedPiece:'black', assignedTurn:false},
-      {assignedPiece:'white', assignedTurn:true}
+      {assignedPiece:'black', assignedTurn:'b' === turn},
+      {assignedPiece:'white', assignedTurn:'w' === turn}
     ]
   } else {
     return [
-      {assignedPiece:'white', assignedTurn:true},
-      {assignedPiece:'black', assignedTurn:false},
+      {assignedPiece:'white', assignedTurn:'w' === turn},
+      {assignedPiece:'black', assignedTurn:'b' === turn},
     ];
     
   }
@@ -157,7 +169,7 @@ io.on('connection', (socket) => {
     if(rooms[roomIndex].players.length === 2){
       console.log('Two players are in the game, start it !');
       
-      rooms[roomIndex].chess = new Chess()
+      rooms[roomIndex].chess = new Chess(rooms[roomIndex].fen)
 
       //stalemate fen: '8/8/8/8/8/4k3/3p4/4K3 w - - 0 2'
       
@@ -165,7 +177,7 @@ io.on('connection', (socket) => {
       // rooms[roomIndex].chess = new Chess('r2k1bnr/ppp1pppp/8/1B6/3P2Q1/N7/nP1P1PPP/R1B1K1NR w KQ - 0 9');
       
       // assigning the pieces, and telling each player who is who
-      let assignedData = GetPieces()   
+      let assignedData = GetPieces(rooms[roomIndex].chess.turn())   
       for(let i = 0; i <= 1;i++){
         rooms[roomIndex].players[i].pieces = assignedData[i].assignedPiece
         rooms[roomIndex].players[i].playersTurn = assignedData[i].assignedTurn
@@ -187,7 +199,9 @@ io.on('connection', (socket) => {
     
     // In this case, the room does not exist. Create it and add this user as the first player...
   } else {
-    rooms.push(ChessRoom(socketRoomId, Player(socket.id)))
+    let newFen = fullFenValidation(socket.handshake.query.fen) ? socket.handshake.query.fen : undefined;
+
+    rooms.push(ChessRoom(socketRoomId, newFen, Player(socket.id)))
   }
   
   
