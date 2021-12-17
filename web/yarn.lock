@@ -5446,6 +5446,11 @@
   dependencies:
     "bser" "2.1.1"
 
+"fen-validator@^1.4.1":
+  "integrity" "sha512-XKKDbBINjN41r4xFRMOCZYSx3Nu/IVwL2a3ZlR0JtI3G+awmwp/qj1Jy5KjTDAysBW3GAtG96aD4Jeoig1NIcQ=="
+  "resolved" "https://registry.npmjs.org/fen-validator/-/fen-validator-1.4.1.tgz"
+  "version" "1.4.1"
+
 "figgy-pudding@^3.5.1":
   "integrity" "sha512-0btnI/H8f2pavGMN8w40mlSKOfTK2SVJmBfBeVIj3kNw0swwgzyRq0d5TJVOwodFmtvpPeWPN/MCcfuWF0Ezbw=="
   "resolved" "https://registry.npmjs.org/figgy-pudding/-/figgy-pudding-3.5.2.tgz"

@@ -8,11 +8,13 @@ const SocketProvider = ({children}) => {
 
     const [socket, setSocket] = useState(null)
 
-    const connect = roomId => {
+    const connect = ({roomId, fen = false}) => {
+        const queryParams = {roomId}
+        if(fen) {
+            queryParams.fen = fen
+        }
         const socketConnection = io(process.env.REACT_APP_SERVER_ADDRESS, {
-            query: {
-                roomId
-            }
+            query: queryParams
         })
         setSocket(socketConnection)
     }
