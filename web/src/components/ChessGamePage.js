@@ -59,6 +59,11 @@ export function ChessGamePage({fen = false}) {
             console.log("not connected");
             return
         }
+
+        socket.on('ping-client', ()=> {
+            socket.emit('pong-server');
+        });
+
         socket.on("connect", () => {
             console.log("connected");
             setIsConnected(true)

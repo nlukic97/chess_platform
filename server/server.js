@@ -47,11 +47,11 @@ function GameOutcome(reason = undefined,winner = undefined,loser=undefined){
 }
 
 /**checks if the submitted move is amongs the possible moves.
- * Takes a chess (object from within a room) and a move(string)
- * in order to confirm if the submitted move is possible
- */
+* Takes a chess (object from within a room) and a move(string)
+* in order to confirm if the submitted move is possible
+*/
 function validateMove(chess,move){
-/*   console.log(move);
+  /*   console.log(move);
   console.log(chess.moves());
   console.log(chess.moves().includes(move)) */
   let moveOutcome = chess.move(move)
@@ -60,9 +60,9 @@ function validateMove(chess,move){
 
 function fullFenValidation(fen){
   if(typeof(fen) !== 'string'){
-      return false
+    return false
   } else {
-      return validateFEN(fen)
+    return validateFEN(fen)
   }
 }
 
@@ -73,10 +73,10 @@ function fullFenValidation(fen){
 * The data is: which piece the player is, and if it's their turn. ('white' pieces go first, so the turn will be 'true')
 * */
 function GetPieces(turn){
-
+  
   let randNum = Math.floor(Math.random() * (2 - 0) + 0); // 0 or 1
-
-
+  
+  
   if(randNum === 0){
     return [
       {assignedPiece:'black', assignedTurn:'b' === turn},
@@ -120,15 +120,16 @@ let rooms = []
 /* let rooms = [
   {
     id:123,
-  players:[],
-  players:[{socketId:'randomSocketId',pieces:undefined, playersTurn:undefined}],
-  players:[{socketId:'randomSocketId',pieces:undefined,playersTurn:undefined},{socketId:'random2',pieces:undefined,playersTurn:undefined}],
+    players:[],
+    players:[{socketId:'randomSocketId',pieces:undefined, playersTurn:undefined}],
+    players:[{socketId:'randomSocketId',pieces:undefined,playersTurn:undefined},{socketId:'random2',pieces:undefined,playersTurn:undefined}],
   }
 ] */
 
 io.on('connection', (socket) => {
-  
   socketRoomId = socket.handshake.query.roomId
+  
+  
   
   // If the user has not submitted a number parameter to join a room, they will be disconnected
   if(socketRoomId === undefined || socketRoomId === null){
@@ -140,7 +141,7 @@ io.on('connection', (socket) => {
     console.log('Disconnecting user - roomId is not a uuid');
     return socket.disconnect()
   }
-
+  
   console.log('connected',socket.id);
   
   socket.join(socketRoomId) //subscribing the user to the room id which they provided
@@ -170,7 +171,7 @@ io.on('connection', (socket) => {
       console.log('Two players are in the game, start it !');
       
       rooms[roomIndex].chess = new Chess(rooms[roomIndex].fen)
-
+      
       //stalemate fen: '8/8/8/8/8/4k3/3p4/4K3 w - - 0 2'
       
       /**  for testing purposes */
@@ -200,10 +201,28 @@ io.on('connection', (socket) => {
     // In this case, the room does not exist. Create it and add this user as the first player...
   } else {
     let newFen = fullFenValidation(socket.handshake.query.fen) ? socket.handshake.query.fen : undefined;
-
+    
     rooms.push(ChessRoom(socketRoomId, newFen, Player(socket.id)))
   }
   
+  
+  /* making a method to ping the client to see what the delay is 
+  (will be necessary to correctly adjust chess clocks in the vent of latency) */
+  var startTime;
+  var amount = 0;
+  let pingMethod = setInterval(()=> {
+    startTime = Date.now();
+    socket.emit('ping-client');
+    amount++
+    if(amount === 10){
+      clearInterval(pingMethod)
+    }
+  }, 2000);
+  
+  socket.on('pong-server', function() {
+    var latency = Date.now() - startTime;
+    console.log('Latency in ms: ',socket.id,latency);
+  });
   
   
   // Socket events and emits
@@ -216,52 +235,52 @@ io.on('connection', (socket) => {
     let roomIndex = rooms.findIndex(room => room.id === submittedRoomId)
     let player = rooms[roomIndex].players.find(player=> player.socketId === socket.id);
     
-
-
+    
+    
     /* -----------------------Testing purposes only  - uncomment this, and the chess game works (with no validation on the server, it just shares the payload)----------------------- */
-/*     socket.emit('move-made',data) //sending to the person who submitted the move
+    /*     socket.emit('move-made',data) //sending to the person who submitted the move
     socket.to(rooms[roomIndex].id).emit('move-made',data) //sending to everyone but the sender in the specific room
     return */
     /* ----------------------- Testing purposes only ----------------------- */
-
-
-
+    
+    
+    
     if(player.playersTurn === true) {
       if(validateMove(rooms[roomIndex].chess, data) === true){
-
+        
         switchTurns(submittedRoomId) //change who's turn it is
         socket.emit('move-valid',{valid:true, chess: rooms[roomIndex].chess.fen()}) //sending to the person who submitted the move  ----> move-valid
         socket.to(rooms[roomIndex].id).emit('move-made',data) //sending to everyone but the sender in the specific room
-
+        
         // after the switch has been made, we check if the next player is in checkmate
         // If the game is over, handle what happens
         if(rooms[roomIndex].chess.game_over()){
-
+          
           // due to checkmate
           if(rooms[roomIndex].chess.in_checkmate()){
             
             // sending the game outcome to all clients
             let outcome = handleCheckmate(roomIndex)
             io.in(rooms[roomIndex].id).emit('game-over',outcome)
-
+            
             // specific draw situations  
           } else if(rooms[roomIndex].chess.in_stalemate()){ // stalemate
             io.in(rooms[roomIndex].id).emit('game-over',GameOutcome('stalemate'))
             
           } else if(rooms[roomIndex].chess.in_threefold_repetition()){ // threefold_repetition
             io.in(rooms[roomIndex].id).emit('game-over',GameOutcome('threefold-repetition'))
-          
+            
           } else if(rooms[roomIndex].chess.in_draw()){
             io.in(rooms[roomIndex].id).emit('game-over',GameOutcome('draw'))
             
           } else { // other reason for game to be over
             io.in(rooms[roomIndex].id).emit('game-over',GameOutcome('other'))
           }
-
+          
           for(let i = 0; i <= 1; i++){
             rooms[roomIndex].players[i].playersTurn = false
           }
-
+          
           console.log(rooms[roomIndex].players);
         }
       } else {
@@ -275,7 +294,7 @@ io.on('connection', (socket) => {
     }
     
   })
-
+  
   /** Chat message */
   socket.on('message-sent',(msg)=>{
     console.log(msg);
@@ -289,14 +308,14 @@ io.on('connection', (socket) => {
   // When a user leaves ...
   socket.on('disconnect',()=>{
     console.log('user has disconnected');
-
+    
     let room = findRoom(socket.id)
-
+    
     // if the game has already started, remove the player emmit to the other player that the game is over due to player disconnection
     if(room.chess !== undefined){
       socket.to(room.id).emit('game-over',GameOutcome('player-disconnected'))
     }
-
+    
     // remove the player from the room, and remove this room if there are no players left
     rooms = rooms.map(room=> {
       room.players = room.players.filter(player=> player.socketId !== socket.id)
