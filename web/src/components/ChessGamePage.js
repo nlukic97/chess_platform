@@ -59,6 +59,35 @@ export function ChessGamePage({fen = false}) {
             console.log("not connected");
             return
         }
+
+        /* Calculating the latency. 
+        Source: https://socket.io/docs/v3/migrating-from-2-x-to-3-0/#no-more-pong-event-for-retrieving-latency */
+        let pings = []
+        let averagePing;
+        let pingInterval = setInterval(() => {
+            const start = Date.now();
+        
+            // volatile, so the packet will be discarded if the socket is not connected
+            socket.volatile.emit("ping-server", () => {
+            const latency = (Date.now() - start) /2; // Only need one time communication (client to server), so we divide by 2
+            console.log(`Latency: ${latency}ms`);
+            pings.push(parseInt(latency))
+            });
+            
+            if(pings.length >= 10){
+                clearInterval(pingInterval)
+                averagePing = pings.reduce((acc,curr)=>{
+                    acc += curr
+                    return acc
+                },0)
+
+                averagePing = averagePing / pings.length
+                console.log(`The average ping is: ${averagePing}ms`)
+            }
+        }, 5000);
+
+
+
         socket.on("connect", () => {
             console.log("connected");
             setIsConnected(true)
