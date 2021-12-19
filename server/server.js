@@ -12,7 +12,7 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 
 const io = new Server(server, {
-  cors: {origin: corsRules} //http://localhost:3000 when developing
+  cors: {origin: corsRules}
 });
 
 const path = require('path')
@@ -130,7 +130,6 @@ io.on('connection', (socket) => {
   socketRoomId = socket.handshake.query.roomId
   
   
-  
   // If the user has not submitted a number parameter to join a room, they will be disconnected
   if(socketRoomId === undefined || socketRoomId === null){
     console.log('Disconnecting user - no roomId param found');
@@ -206,24 +205,11 @@ io.on('connection', (socket) => {
   }
   
   
-  /* making a method to ping the client to see what the delay is 
-  (will be necessary to correctly adjust chess clocks in the vent of latency) */
-  var startTime;
-  var amount = 0;
-  let pingMethod = setInterval(()=> {
-    startTime = Date.now();
-    socket.emit('ping-client');
-    amount++
-    if(amount === 10){
-      clearInterval(pingMethod)
-    }
-  }, 2000);
-  
-  socket.on('pong-server', function() {
-    var latency = Date.now() - startTime;
-    console.log('Latency in ms: ',socket.id,latency);
+  /* For calculating latency. Source: https://socket.io/docs/v3/migrating-from-2-x-to-3-0/#no-more-pong-event-for-retrieving-latency */
+  socket.on("ping-server", (cb) => {
+    if (typeof cb === "function")
+      cb();
   });
-  
   
   // Socket events and emits
   socket.on('make-move',data=>{
