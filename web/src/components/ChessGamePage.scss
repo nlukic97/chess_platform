@@ -4,8 +4,18 @@
   justify-content: center;
   gap: 20px;
 
+  & > *:first-child {
+    width: calc(min(500px, 95vw));
+  }
+
   @media screen and (max-width: 768px) {
     flex-direction: column;
+    align-items: center;
+    margin: 50px 0;
+
+    & > *:last-child {
+      width: calc(min(500px, 95vw));
+    }
   }
 }
 
