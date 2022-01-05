@@ -5,14 +5,13 @@ import "./HomePage.scss"
 import GeneralInfo from "./GeneralInfo";
 import JoinARoomModal from "./JoinARoomModal";
 import SetFENModal from "./SetFENModal";
-import Modal from "./Modal";
+import {fischerRandomPositions} from "../helpers";
 
 export function HomePage({fen, setFen}) {
 
     const navigate = useNavigate()
     const [showJoinModal, setShowJoinModal] = useState(false)
     const [showFENModal, setShowFENModal] = useState(false)
-    const [showFischerRandomModal, setShowFischerRandomModal] = useState(false)
 
     function handleCreateARoom() {
         const roomUuid = uuidv4()
@@ -20,16 +19,18 @@ export function HomePage({fen, setFen}) {
     }
 
     function handleJoinARoom() {
-        console.log("join a room");
+        console.log("join a room")
         setShowJoinModal(true)
     }
 
     function handleFischerRandom() {
-        setShowFischerRandomModal(true)
+        const position = fischerRandomPositions[Math.floor(Math.random() * (960 + 1))]
+        setFen(position)
+        handleCreateARoom()
     }
 
     function handleCustomFEN() {
-        console.log("join a room");
+        console.log("join a room")
         setShowFENModal(true)
     }
 
@@ -59,8 +60,8 @@ export function HomePage({fen, setFen}) {
                     </button>
                 </div>
                 {showJoinModal && <JoinARoomModal closeModal={() => setShowJoinModal(false)}/>}
-                {showFENModal && <SetFENModal action={handleCreateARoom} fen={fen} setFen={setFen} closeModal={() => setShowFENModal(false)}/>}
-                {showFischerRandomModal && <Modal><h1 onClick={() => setShowFischerRandomModal(false)}>Coming soon</h1></Modal>}
+                {showFENModal && <SetFENModal action={handleCreateARoom} fen={fen} setFen={setFen}
+                                              closeModal={() => setShowFENModal(false)}/>}
                 <GeneralInfo/>
             </div>
         </div>

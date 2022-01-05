@@ -5,46 +5,45 @@ import {useSocket} from "../contexts/SocketProvider";
 import "./CustomChessBoard.scss"
 import GameEndModal from "./GameEndModal";
 
-export default function CustomChessBoard({pieces, playersTurn, initialPosition}) {
-    console.log("initialPosition", initialPosition);
-    const [game, setGame] = useState(initialPosition ? new Chess(initialPosition) : new Chess());
+export default function CustomChessBoard({pieces, playersTurn, game, setGame, safeGameMutate}) {
     const [playerColor,] = useState(pieces)
     const [isMyTurn, setIsMyTurn] = useState(playersTurn)
     const [gameEnded, setGameEnded] = useState(false)
-    const [cbWidth, setCbWidth] = useState(Math.min(500, window.innerWidth * .95))
+    const [cbWidth, setCbWidth] = useState(Math.min(500, window.outerWidth * .95))
     const {socket} = useSocket()
 
+    console.log("Math.min(500, window.outerWidth * .95)", Math.min(500, window.outerWidth * .95));
+
     useEffect(() => {
-        console.log("{pieces, playersTurn}", {pieces, playersTurn})
+        // console.log("{pieces, playersTurn}", {pieces, playersTurn})
         const resizeListener = () => {
-            setCbWidth(Math.min(500, window.innerWidth * .95))
+            setCbWidth(Math.min(500, window.outerWidth * .95))
         }
         window.addEventListener("resize", resizeListener)
         return () => window.removeEventListener("resize", resizeListener)
     }, [])
 
     useEffect(() => {
-        console.log(socket);
+        // console.log(socket);
         if (!socket) return
         socket.on("move-valid", ({valid, chess}) => {
-            console.log("move-valid");
+            // console.log("move-valid");
             if (!valid) {
-                console.log("chess:", chess);
-                console.log("MOVE IS INVALID");
+                // console.log("chess:", chess);
+                // console.log("MOVE IS INVALID");
                 setGame(new Chess(chess))
             }
-            console.log(valid, chess);
+            // console.log(valid, chess);
         })
         socket.on("move-made", (move) => {
-            console.log("move-made");
-            console.log(move);
+            // console.log("move-made");
             setGame(g => {
                 const gameCopy = {...g};
                 gameCopy.move(move)
                 return gameCopy
             })
             setIsMyTurn(true)
-            console.log(move);
+            // console.log(move);
         })
         socket.on("game-over", (msg) => {
             setGameEnded(msg)
@@ -56,16 +55,9 @@ export default function CustomChessBoard({pieces, playersTurn, initialPosition})
         }
     }, [socket])
 
-    function safeGameMutate(modify) {
-        // await new Promise((resolve, reject) => {
-        //     resolve()
-        // })
-        setGame((g) => {
-            const update = {...g};
-            modify(update);
-            return update;
-        });
-    }
+    useEffect(() => {
+        console.log("useEffect game changed:", game?.fen());
+    },[game])
 
     function onDrop(sourceSquare, targetSquare) {
         let move = null;
@@ -74,7 +66,7 @@ export default function CustomChessBoard({pieces, playersTurn, initialPosition})
             move = game.move({
                 from: sourceSquare,
                 to: targetSquare,
-                // TODO: add premove
+                // TODO: add promotion
                 promotion: 'q'
             });
         });
@@ -82,7 +74,7 @@ export default function CustomChessBoard({pieces, playersTurn, initialPosition})
         socket.emit("make-move", {
             from: sourceSquare,
             to: targetSquare,
-            promotion: 'q' // TODO: add premove
+            promotion: 'q' // TODO: add promotion
         })
         return true;
     }
@@ -92,7 +84,7 @@ export default function CustomChessBoard({pieces, playersTurn, initialPosition})
     return (
         <div className="CustomChessBoard">
             <Chessboard
-                position={game.fen()}
+                position={game?.fen()}
                 areArrowsAllowed={true}
                 // arePiecesDraggable={isMyTurn}
                 arePremovesAllowed={true}
