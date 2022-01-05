@@ -11,16 +11,16 @@ const Chat = () => {
     const bottomOfChatRef = useRef()
 
     useEffect(() => {
-        console.log("chat init");
+        // console.log("chat init");
         setMessages([{msg: "The game has started!", timestamp: 0}])
     }, [])
 
     useEffect(() => {
-        console.log("socket useeffect in chat");
-        console.log(socket);
+        // console.log("socket useeffect in chat");
+        // console.log(socket);
         if (!socket) return
         socket.on("message-received", ({msg, timestamp}) => {
-            console.log("message-received")
+            // console.log("message-received")
             setMessages(oldMsgs => [...oldMsgs, {msg: `them: ${msg}`, timestamp}])
         })
     }, [socket])
@@ -31,8 +31,8 @@ const Chat = () => {
 
     function sendMessage() {
         if (messageInput.trim() === "") return
-        console.log(messageInput);
-        console.log("message-sent");
+        // console.log(messageInput);
+        // console.log("message-sent");
         setMessages(oldMsgs => [...oldMsgs, {msg: `me: ${messageInput}`, timestamp: new Date().getTime()}])
         socket.emit("message-sent", messageInput)
         setMessageInput("")
@@ -43,7 +43,7 @@ const Chat = () => {
         sendMessage()
     }
 
-    console.log("rerender chat");
+    // console.log("rerender chat");
 
     return (
         <div className="messages-wrapper">
