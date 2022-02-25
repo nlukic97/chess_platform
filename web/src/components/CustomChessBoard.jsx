@@ -48,6 +48,14 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
         socket.on("game-over", (msg) => {
             setGameEnded(msg)
         })
+
+        socket.on('draw-declined',()=>{
+            alert('draw declined!');
+        })
+        
+        socket.on('draw-offered',()=>{
+            alert('draw offered!');
+        })
         return () => {
             socket.off("make-move")
             socket.off("is-valid")
@@ -97,6 +105,10 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
             />
             {gameEnded && <GameEndModal winner={gameEnded.winner} reason={gameEnded.reason}
                                         closeModal={() => setGameEnded(false)}/>}
+            <button onClick={()=>{socket.emit('resign')}}>Resign</button>
+            <button onClick={()=>{socket.emit('offer-draw')}}>Draw</button>
+            <button onClick={()=>{socket.emit('accept-draw')}}>accept Draw</button>
+            <button onClick={()=>{socket.emit('decline-draw')}}>decline Draw</button>
         </div>
     );
 }
