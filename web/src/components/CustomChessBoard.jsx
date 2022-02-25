@@ -56,6 +56,19 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
         socket.on('draw-offered',()=>{
             alert('draw offered!');
         })
+
+        // The audio element
+        let audio = document.querySelector('#dame-dameyu')
+        audio.addEventListener('timeupdate',(e)=>{
+            console.log(audio.currentTime);
+            if(audio.currentTime > 8){
+                audio.pause()
+                audio.currentTime = 0
+            }
+        })
+        socket.on('dame-dameyu',()=>{
+            audio.play()  
+        })
         return () => {
             socket.off("make-move")
             socket.off("is-valid")
@@ -109,6 +122,12 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
             <button onClick={()=>{socket.emit('offer-draw')}}>Draw</button>
             <button onClick={()=>{socket.emit('accept-draw')}}>accept Draw</button>
             <button onClick={()=>{socket.emit('decline-draw')}}>decline Draw</button>
+            <button onClick={()=>{socket.emit('dame-dameyu')}}>dame-dameyu</button>
+            {/* Audio element */}
+            <audio id='dame-dameyu' style={{opacity:0}}>
+                <source src="dame-dameyu.mp3" type="audio/mp3"/>
+                Your browser does not support the audio element.
+            </audio>
         </div>
     );
 }
