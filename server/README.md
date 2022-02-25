@@ -77,6 +77,9 @@ Data the 2nd player will receive:
 
 ## 7. draw-declined
 - When this event is emmited from the server, it means that the user you have offered a draw to has declined your request.
+
+## 8. dame-dameyu
+- Both players will receive this emit at the same time when one player emits an event of the same name. Do as you please with it. 😎
 ---
 # Events to emit from from frontned
 
@@ -95,3 +98,6 @@ Data the 2nd player will receive:
 
 ## 5. decline-draw
 - A user who is offered a draw will decline it. Server will only handle this when the player to whom the draw has been offered emits this event.
+
+## 6. dame-dameyu
+- A player who emits this to the server will cause the server to emit an event of the same name to both players in the room, including themself. Do as you please with it. 😎

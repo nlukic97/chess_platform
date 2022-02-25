@@ -315,6 +315,13 @@ io.on('connection', (socket) => {
       }
     }
   })
+
+  socket.on('dame-dameyu',()=>{
+    let room = findRoom(socket.id)
+    if(room){
+      io.in(room.id).emit('dame-dameyu')
+    }
+  })
   
   
   // When a user leaves ...
