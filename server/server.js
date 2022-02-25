@@ -26,7 +26,8 @@ function ChessRoom(roomId, fen = undefined, ...players){
     id: roomId,
     players: players,
     chess: undefined,
-    fen:fen
+    fen:fen,
+    drawOfferedTo:undefined
   }
 }
 
@@ -51,9 +52,6 @@ function GameOutcome(reason = undefined,winner = undefined,loser=undefined){
 * in order to confirm if the submitted move is possible
 */
 function validateMove(chess,move){
-  /*   console.log(move);
-  console.log(chess.moves());
-  console.log(chess.moves().includes(move)) */
   let moveOutcome = chess.move(move)
   return (moveOutcome === null) ? false : true;
 }
@@ -73,9 +71,7 @@ function fullFenValidation(fen){
 * The data is: which piece the player is, and if it's their turn. ('white' pieces go first, so the turn will be 'true')
 * */
 function GetPieces(turn){
-  
   let randNum = Math.floor(Math.random() * (2 - 0) + 0); // 0 or 1
-  
   
   if(randNum === 0){
     return [
@@ -100,14 +96,6 @@ function switchTurns(roomId){
 function handleCheckmate(roomIndex){
   let winner = rooms[roomIndex].players.find(player=> player.playersTurn === false).pieces
   let loser = rooms[roomIndex].players.find(player=> player.playersTurn === true).pieces
-  
-  // rooms[roomIndex].players.forEach(player=>{
-  //   if(player.playersTurn === true){
-  //     console.log(`${player.pieces} has lost the game due to checkmate.`);
-  //   } else if(player.playersTurn === false){
-  //     console.log(`${player.pieces} has won the game with a checkmate.`);
-  //   }
-  // })
   return GameOutcome('checkmate',winner,loser)
 }
 
@@ -117,18 +105,8 @@ function findRoom(socketId){
 
 let rooms = []
 
-/* let rooms = [
-  {
-    id:123,
-    players:[],
-    players:[{socketId:'randomSocketId',pieces:undefined, playersTurn:undefined}],
-    players:[{socketId:'randomSocketId',pieces:undefined,playersTurn:undefined},{socketId:'random2',pieces:undefined,playersTurn:undefined}],
-  }
-] */
-
 io.on('connection', (socket) => {
   socketRoomId = socket.handshake.query.roomId
-  
   
   // If the user has not submitted a number parameter to join a room, they will be disconnected
   if(socketRoomId === undefined || socketRoomId === null){
@@ -142,7 +120,6 @@ io.on('connection', (socket) => {
   }
   
   console.log('connected',socket.id);
-  
   socket.join(socketRoomId) //subscribing the user to the room id which they provided
   
   // potential for a little backdoor fun here, ide gas
@@ -193,8 +170,7 @@ io.on('connection', (socket) => {
         io.to(player.socketId).emit('game-started',payload)
       }
       console.log(rooms[roomIndex].players);
-      
-      // console.log(rooms[0]);
+      console.log(rooms[roomIndex]);
     }
     
     // In this case, the room does not exist. Create it and add this user as the first player...
@@ -219,17 +195,14 @@ io.on('connection', (socket) => {
     let submittedRoomId = socket.handshake.query.roomId
     console.log('make move');
     let roomIndex = rooms.findIndex(room => room.id === submittedRoomId)
-    let player = rooms[roomIndex].players.find(player=> player.socketId === socket.id);
     
-    
-    
-    /* -----------------------Testing purposes only  - uncomment this, and the chess game works (with no validation on the server, it just shares the payload)----------------------- */
-    /*     socket.emit('move-made',data) //sending to the person who submitted the move
-    socket.to(rooms[roomIndex].id).emit('move-made',data) //sending to everyone but the sender in the specific room
-    return */
-    /* ----------------------- Testing purposes only ----------------------- */
-    
-    
+    // if a draw offer is active and the player who made the move is the one who can accept it, the draw will be declined and the move will be made
+    if(rooms[roomIndex].drawOfferedTo === socket.id){
+      socket.to(rooms[roomIndex].id).emit('draw-declined')
+      rooms[roomIndex].drawOfferedTo = undefined
+    }
+    let player = rooms[roomIndex].players.find(player=> player.socketId === socket.id);   
+
     
     if(player.playersTurn === true) {
       if(validateMove(rooms[roomIndex].chess, data) === true){
@@ -289,6 +262,59 @@ io.on('connection', (socket) => {
       socket.to(room.id).emit('message-received',{msg:msg, timestamp: new Date().getTime()}) //sends the event to all users in the room except the sender (so, to the other player)
     }
   })
+
+  /* Resignation */
+  socket.on('resign',()=>{
+    console.log(`User ${socket.id} has resigned`);
+    let room = findRoom(socket.id)
+    
+    if(room){
+      let loser = room.players.find(player=> player.socketId === socket.id).pieces
+      let winner = room.players.find(player=> player.socketId !== socket.id).pieces
+
+      // console.log(room);
+      //kako da ovde kazem ko je winner a ko je loser. Znaci na resign, moram da kazem ko je winner a ko loser. Loser je onaj koji je poslao zahtev za emit, winner je drugi lik u sobi.
+      io.in(room.id).emit('game-over',GameOutcome('resignation',winner,loser))
+      // znaci na emit ovoga obojici, stoji ko je winner a ko loser. i tako se obavestavaju.
+    }
+  })
+
+  /* draw */
+  socket.on('offer-draw',()=>{
+    console.log(`User ${socket.id} has offered a draw`);
+    let room = findRoom(socket.id)
+    if(room){
+      //checking if a draw offer is not actively awaiting a response
+      if(room.drawOfferedTo === undefined){
+        // adding drawOfferedTo, so we can know who has the ability to emit the 'accept-draw' or 'decline-draw' events
+        room.drawOfferedTo = room.players.find(player=> player.socketId !== socket.id).socketId
+        console.log(room.drawOfferedTo);
+        socket.to(room.id).emit('draw-offered')
+      }
+    }
+  })
+
+  socket.on('accept-draw',()=>{
+    let room = findRoom(socket.id)
+    if(room){
+      //making sure that this user has been offered a draw
+      if(room.drawOfferedTo === socket.id){
+        io.in(room.id).emit('game-over',GameOutcome('draw'))
+        room.drawOfferedTo = undefined
+      }
+    }
+  })
+
+  socket.on('decline-draw',()=>{
+    let room = findRoom(socket.id)
+    if(room){
+      //making sure that this user has been offered a draw
+      if(room.drawOfferedTo === socket.id){
+        socket.to(room.id).emit('draw-declined')
+        room.drawOfferedTo = undefined
+      }
+    }
+  })
   
   
   // When a user leaves ...
@@ -309,15 +335,6 @@ io.on('connection', (socket) => {
     }).filter(room => room.players.length > 0)
   })
 });
-
-
-// ---------- just for testing purposes ----------
-/* app.use(express.static('public'))
-app.get('/',(req,res)=>{
-  res.sendFile(__dirname+'/public/index.html')
-}) */
-// ---------- just for testing purposes ----------
-
 
 server.listen(port, () => {
   console.log(`listening on http://localhost:${port}`);

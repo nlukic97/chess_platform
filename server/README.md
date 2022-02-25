@@ -71,10 +71,27 @@ Data the 2nd player will receive:
         {
             reason: 'disconnected'
         }
+
+## 6. draw-offered
+- A user who receives this has just been offered a draw, and has the ability to either emit 'accept-draw' or 'decline-draw'.
+
+## 7. draw-declined
+- When this event is emmited from the server, it means that the user you have offered a draw to has declined your request.
 ---
 # Events to emit from from frontned
 
 
 ## 1. make-move
--  <del>this is mostly finished, I just need to make sure what the data being passed to the server looks like for validation</del>
-- Backend and frontend are compatible. Now, if a user manages to submit an illegal move to the server, the server must return the board to its original state before the illegal move.
+- Backend and frontend are compatible. Now, if a user manages to submit an illegal move to the server, the server must return the board to its original state before the illegal move. A user who emits 'make-move' will also decline any active draw offers they may have received.
+
+## 2. resign
+-  Tells the server that the player who clicks it wishes to resign. This will end the game by emitting the 'game-over' event to both players.
+
+## 3. offer-draw
+- Offers a draw to the other user. Handled by server only if there is no current draw offer in the game.
+
+## 4. accept-draw
+- A user who is offered a draw will accept it, ending the game (end game message should be adjusted). Server will only handle this when the player to whom the draw has been offered emits this event.
+
+## 5. decline-draw
+- A user who is offered a draw will decline it. Server will only handle this when the player to whom the draw has been offered emits this event.
