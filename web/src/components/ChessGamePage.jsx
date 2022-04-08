@@ -9,6 +9,8 @@ import Chess from "chess.js";
 import * as PropTypes from "prop-types";
 import {GameHistory} from "./GameHistory";
 
+import VoiceChat from "./VoiceChat"
+
 const ConnectingLoader = () => (
     <Modal>
         <div className="loader-spinner"/>
@@ -130,8 +132,11 @@ export function ChessGamePage({fen = false}) {
             {!isConnected ? <ConnectingLoader/>
                 : gameStarted ? (
                     <div className="game-chat-wrapper">
+                        <div>
                         <CustomChessBoard {...gameData} game={game}/>
                         <GameHistory game={game} />
+                        <VoiceChat/>
+                        </div>
                         <Chat/>
                     </div>
                 ) : (
