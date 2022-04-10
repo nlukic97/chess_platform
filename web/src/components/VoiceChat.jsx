@@ -1,74 +1,68 @@
+import React,{useState,useEffect} from 'react'
+import {useSocket} from "../contexts/SocketProvider";
 import './VoiceChat.scss'
-import React,{useState, useEffect} from 'react'
 
-const VoiceChat = () => {
-
-    const [message,setMessage] = useState('Not recording')
-    const [recordingStatus,setrecordingStatus] = useState(false)
-    const [playerSrc,setPlayerSrc] = useState('')
-    const chunks = []
-
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        console.log("audio recording supported")
-    } else {
-        console.log("audio recording is not supported on your browser!")
-    }
+function VoiceChat(){
     
-    function startRecording(){
-        if(recordingStatus === true) return null
-        setrecordingStatus(true)
-        setMessage('Recording...')
-        navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: false
-        })
-        .then(handleSuccess.bind(this))
-        .catch(e=>{
-            console.log(e);
-        })
-    }
-    function stopRecording(){
-        if(recordingStatus === false) return null
-        setrecordingStatus(false)
-        setMessage('Not recording')
-    }
-
-    function onMediaRecorderDataAvailable(e) { this.chunks.push(e.data) }
-
-    function onMediaRecorderStop(e){ 
-        const blob = new Blob(this.chunks, { 'type': 'audio/ogg; codecs=opus' })
-			const audioURL = window.URL.createObjectURL(blob)
-			setPlayerSrc(audioURL)
-			this.chunks = []
-			this.stream.getAudioTracks().forEach(track => track.stop())
-			this.stream = null
-    }
-
+    const [recording, setRecording]=useState(false)
+    window.mediaRec = null;
+    const {socket} = useSocket()
     
-    function handleSuccess(streamHandled){
-        const stream = streamHandled
-        console.log(stream);
-        stream.oninactive = ()=>{
-            console.log('stream ended');
+    const recordBtn =()=>{
+        if(recording === false){
+            setRecording(true) //recording
+            record()
+        } else {
+            setRecording(false) //stop recording
+            window.mediaRec.stop()
         }
-        var mediaRecorder = new MediaRecorder(stream)
-        console.log(mediaRecorder);
-
-        mediaRecorder.ondataavailable = (e)=> onMediaRecorderDataAvailable(e)
-        mediaRecorder.onstop = (e) => onMediaRecorderStop(e)
     }
+    
+    function record(){
+        navigator.mediaDevices.getUserMedia({audio:true})
+        .then((mediaStream)=> {
+            window.mediaRec = new MediaRecorder(mediaStream)
+            
+            console.log('mediaRecorder');
+            
+            window.mediaRec.onstart = function(e) {
+                this.chunks = [];
+                console.log('Started');
+            };
+            window.mediaRec.ondataavailable = function(e) {
+                this.chunks.push(e.data);
+            };
+            window.mediaRec.onstop = async function(e) {
+                console.log('ended');
+                var blob = new Blob(this.chunks, { 'type' : 'audio/ogg; codecs=opus' });
+                socket.emit('sendAudio', blob);
+            }
+            
+            // Start recording
+            window.mediaRec.start()
+        });
 
-  return (
-    <div className="container">
-        <audio id="recorder" muted hidden></audio>
+    }
+    useEffect(()=>{
+        socket.on('receiveAudio',async (arrayBuffer)=>{
+            var blob = new Blob([arrayBuffer], { 'type' : 'audio/ogg; codecs=opus' });
+            var audio = document.createElement("audio")
+            audio.src = window.URL.createObjectURL(blob)
+            audio.play()
+        })
+    })
+    
+    return (
+        <div className="container">
         <div>
-            <button id="start" onClick={startRecording}>Record</button>
-            <button id="stop" onClick={stopRecording}>Stop Recording</button>
+        <button id="start" className='StartButton'
+        style={{backgroundColor:recording ? 'red':'black', opacity:'0'}}
+        onClick={recordBtn}>
+        {recording ? 'Recording' : 'Record'}
+        </button>
         </div>
-        <span>{message}</span>
-        <audio id="player" controls src={playerSrc}></audio>
-    </div>
-  )
-}
-
-export default VoiceChat
+        </div>
+        )
+    }
+    
+    export default VoiceChat
