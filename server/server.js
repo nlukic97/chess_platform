@@ -191,7 +191,7 @@ io.on('connection', (socket) => {
   socket.on('sendAudio',(blob)=>{
     let room = findRoom(socket.id) //returns the room where there is a player with this id
     if(room){
-      socket.to(room.id).emit('receiveAudio',blob) //sends the event to all users in the room except the sender (so, to the other player)
+      io.in(room.id).emit('receiveAudio',blob) //sends the event to all users in the room except the sender (so, to the other player)
     }
   })
   
