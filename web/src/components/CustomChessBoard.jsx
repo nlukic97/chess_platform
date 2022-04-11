@@ -4,6 +4,7 @@ import {Chessboard} from 'react-chessboard';
 import {useSocket} from "../contexts/SocketProvider";
 import "./CustomChessBoard.scss"
 import GameEndModal from "./GameEndModal";
+import {PlayCheckAudio} from './PlayCheckAudio';
 
 export default function CustomChessBoard({pieces, playersTurn, game, setGame, safeGameMutate}) {
     const [playerColor,] = useState(pieces)
@@ -42,6 +43,7 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
                 gameCopy.move(move)
                 return gameCopy
             })
+
             setIsMyTurn(true)
             // console.log(move);
         })
@@ -69,6 +71,7 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
         socket.on('dame-dameyu',()=>{
             audio.play()  
         })
+
         return () => {
             socket.off("make-move")
             socket.off("is-valid")
@@ -78,6 +81,8 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
 
     useEffect(() => {
         console.log("useEffect game changed:", game?.fen());
+
+        PlayCheckAudio(game) //plays audio when an oponent is in check
     },[game])
 
     function onDrop(sourceSquare, targetSquare) {
@@ -125,7 +130,7 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
             <button onClick={()=>{socket.emit('dame-dameyu')}}>dame-dameyu</button>
             {/* Audio element */}
             <audio id='dame-dameyu' style={{opacity:0}}>
-                <source src="dame-dameyu.mp3" type="audio/mp3"/>
+                <source src="./audio/dame-dameyu.mp3" type="audio/mp3"/>
                 Your browser does not support the audio element.
             </audio>
         </div>
