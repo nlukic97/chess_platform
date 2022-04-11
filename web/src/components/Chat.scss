@@ -32,7 +32,15 @@
     color: #111;
 
     .message {
-      padding: 3px 2px;
+     padding: 3px 2px;
+     &.them {
+       background-color: #333;
+       color: #fff;
+     }
+     &.me {
+       background-color: #fff;
+       color: #333;
+     }
     }
   }
 

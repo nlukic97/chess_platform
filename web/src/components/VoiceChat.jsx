@@ -56,7 +56,7 @@ function VoiceChat(){
         <div className="container">
         <div>
         <button id="start" className='StartButton'
-        style={{backgroundColor:recording ? 'red':'black', opacity:'0'}}
+        style={{backgroundColor:recording ? 'red':'black'}}
         onClick={recordBtn}>
         {recording ? 'Recording' : 'Record'}
         </button>

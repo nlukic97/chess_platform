@@ -21,7 +21,7 @@ const Chat = () => {
         if (!socket) return
         socket.on("message-received", ({msg, timestamp}) => {
             // console.log("message-received")
-            setMessages(oldMsgs => [...oldMsgs, {msg: `them: ${msg}`, timestamp}])
+            setMessages(oldMsgs => [...oldMsgs, {msg: `them: ${msg}`, class:'them', timestamp}])
         })
     }, [socket])
 
@@ -33,7 +33,7 @@ const Chat = () => {
         if (messageInput.trim() === "") return
         // console.log(messageInput);
         // console.log("message-sent");
-        setMessages(oldMsgs => [...oldMsgs, {msg: `me: ${messageInput}`, timestamp: new Date().getTime()}])
+        setMessages(oldMsgs => [...oldMsgs, {msg: `me: ${messageInput}`, class:'me', timestamp: new Date().getTime()}])
         socket.emit("message-sent", messageInput)
         setMessageInput("")
     }
@@ -48,7 +48,7 @@ const Chat = () => {
     return (
         <div className="messages-wrapper">
             <div className="messages-container">
-                {messages.map(msg => <div className="message" key={msg.timestamp}>{msg.msg}</div>)}
+                {messages.map(msg => <div className={msg.class + ' message'} key={msg.timestamp}>{msg.msg}</div>)}
                 <div ref={bottomOfChatRef}/>
             </div>
             <div className="form-container">
