@@ -12,7 +12,7 @@ const Chat = () => {
     
     useEffect(() => {
         // console.log("chat init");
-        setMessages([{type:"msg", msg: "The game has started! Please wait 1s before starting to speak when sending a voice message. It's a feature.", timestamp: 0}])
+        setMessages([{type:"msg", msg: "The game has started! It's a feature. A hidden feature.", timestamp: 0}])
         
         /* Adding audio to an audio message to be added to the chat */
         socket.on('receiveAudio',async (arrayBuffer)=>{
@@ -20,8 +20,13 @@ const Chat = () => {
             /* var audio = document.createElement("audio")
             audio.src = window.URL.createObjectURL(blob)
             audio.play() */
-            setMessages(oldMsgs => [...oldMsgs, {type:'voice',src:window.URL.createObjectURL(blob), timestamp: new Date().getTime()}])
+            setMessages(oldMsgs => [...oldMsgs, {type:'voice',src:window.URL.createObjectURL(blob), class:'them', timestamp: new Date().getTime()}])
         })
+        const focusListener = () => {
+            document.title = "🔥 C H E S S 🔥"
+        }
+        window.addEventListener("focus", focusListener)
+        return () => window.removeEventListener("focus", focusListener)
     }, [])
     
     useEffect(() => {
@@ -31,6 +36,9 @@ const Chat = () => {
         socket.on("message-received", ({msg, timestamp}) => {
             // console.log("message-received")
             setMessages(oldMsgs => [...oldMsgs, {type:"msg", msg: `them: ${msg}`, class:'them', timestamp}])
+            if(!document.hasFocus()) {
+                document.title = "📧 N E W  M E S S A G E 📧"
+            }
         })
     }, [socket])
     
@@ -61,7 +69,7 @@ const Chat = () => {
             messages.map(msg => msg.type === "msg" ?
             (<div className={msg.class + ' message'} key={msg.timestamp}>{msg.msg}</div>)
             : 
-            <audio key={msg.timestamp} src={msg.src} controls style={{width:'100%'}}></audio>
+            <audio className={msg.class + ' message'} key={msg.timestamp} src={msg.src} controls style={{width:'100%'}}></audio>
             )
             
         }

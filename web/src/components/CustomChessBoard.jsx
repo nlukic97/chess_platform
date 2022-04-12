@@ -4,11 +4,11 @@ import {Chessboard} from 'react-chessboard';
 import {useSocket} from "../contexts/SocketProvider";
 import "./CustomChessBoard.scss"
 import GameEndModal from "./GameEndModal";
-import {PlayCheckAudio} from './PlayCheckAudio';
+import { playCheckAudio } from '../helpers';
 
 export default function CustomChessBoard({pieces, playersTurn, game, setGame, safeGameMutate}) {
     const [playerColor,] = useState(pieces)
-    const [isMyTurn, setIsMyTurn] = useState(playersTurn)
+    // const [isMyTurn, setIsMyTurn] = useState(playersTurn)
     const [gameEnded, setGameEnded] = useState(false)
     const [cbWidth, setCbWidth] = useState(Math.min(500, window.outerWidth * .95))
     const {socket} = useSocket()
@@ -34,6 +34,9 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
                 // console.log("MOVE IS INVALID");
                 setGame(new Chess(chess))
             }
+            if(game.in_check()) {
+                playCheckAudio()
+            }
             // console.log(valid, chess);
         })
         socket.on("move-made", (move) => {
@@ -44,7 +47,7 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
                 return gameCopy
             })
 
-            setIsMyTurn(true)
+            // setIsMyTurn(true)
             // console.log(move);
         })
         socket.on("game-over", (msg) => {
@@ -80,10 +83,11 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
     }, [socket])
 
     useEffect(() => {
-        console.log("useEffect game changed:", game?.fen());
-
-        PlayCheckAudio(game) //plays audio when an oponent is in check
-    },[game])
+        document.title = ((game.turn() === "b") === playersTurn) ? "🔥 C H E S S 🔥" : "YOUR MOVE!"
+        console.log({playersTurn})
+        console.log("game.turn():", game.turn())
+        return () => document.title = "🔥 C H E S S 🔥"
+    }, [game])
 
     function onDrop(sourceSquare, targetSquare) {
         let move = null;

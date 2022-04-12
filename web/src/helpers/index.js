@@ -965,3 +965,11 @@ export const fischerRandomPositions = [
     "rkrnnbbq/pppppppp/8/8/8/8/PPPPPPPP/RKRNNBBQ w KQkq - 0 1",
     "rkrnnqbb/pppppppp/8/8/8/8/PPPPPPPP/RKRNNQBB w KQkq - 0 1"
 ]
+
+export const playCheckAudio = () => {
+    // plays e zemljace sad sam najebo
+
+    const audio = document.createElement('audio')
+    audio.src = './audio/1.mp3'
+    audio.play()
+}
