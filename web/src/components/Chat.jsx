@@ -3,6 +3,7 @@ import {useSocket} from "../contexts/SocketProvider";
 import "./Chat.scss"
 import {FiSend} from "react-icons/all";
 
+import { playNewMessageSound } from '../helpers';
 const Chat = ({messages, setMessages}) => {
     
     
@@ -22,6 +23,7 @@ const Chat = ({messages, setMessages}) => {
             audio.src = window.URL.createObjectURL(blob)
             audio.play() */
             setMessages(oldMsgs => [...oldMsgs, {type:'voice',src:window.URL.createObjectURL(blob), class:'them', timestamp: new Date().getTime()}])
+            playNewMessageSound()
         })
         const focusListener = () => {
             document.title = "🔥 C H E S S 🔥"
@@ -38,6 +40,7 @@ const Chat = ({messages, setMessages}) => {
         socket.on("message-received", ({msg, timestamp}) => {
             // console.log("message-received")
             setMessages(oldMsgs => [...oldMsgs, {type:"msg", msg: `them: ${msg}`, class:'them', timestamp}])
+            playNewMessageSound()
         })
     }, [socket])
     
