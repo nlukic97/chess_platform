@@ -3,9 +3,9 @@ import {useSocket} from "../contexts/SocketProvider";
 import "./Chat.scss"
 import {FiSend} from "react-icons/all";
 
-const Chat = () => {
+const Chat = ({messages, setMessages}) => {
     
-    const [messages, setMessages] = useState([])
+    
     const [messageInput, setMessageInput] = useState("")
     const [unreadCount, setUnreadCount] = useState(0)
     const {socket} = useSocket()

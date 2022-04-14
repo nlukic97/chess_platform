@@ -32,14 +32,17 @@
     color: #111;
 
     .message {
-     padding: 3px 2px;
+     padding: 6px 10px;
+     margin: 3px 0;
+     border-radius: 100px;
      &.them {
-       background-color: #333;
+      //  background-color: #333;
+       background-color: rgb(92, 177, 247);;
        color: #fff;
-     }
-     &.me {
-       background-color: #fff;
-       color: #333;
+      }
+      &.me {
+       background-color: rgb(131, 148, 161);
+       color: #fff;
      }
     }
   }

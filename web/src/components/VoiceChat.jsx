@@ -7,7 +7,7 @@ import {
 } from "../contexts/SocketProvider";
 import './VoiceChat.scss'
 
-function VoiceChat() {
+function VoiceChat({setMessages}) {
     const [isRecording, setIsRecording] = useState(false)
     const [startRecording, setStartRecording] = useState(false)
     // window.mediaRec = null;
@@ -52,12 +52,15 @@ function VoiceChat() {
                 'type': 'audio/ogg; codecs=opus'
             });
             socket.emit('sendAudio', blob);
+            setMessages(oldMsgs => [...oldMsgs, {type:'voice',src:window.URL.createObjectURL(blob), class:'me', timestamp: new Date().getTime()}])
+
 
             // Stoping browser use of microphone (removes the red dot from the browser tab)
             mediaStream.getAudioTracks().forEach(track => {
                 track.stop()
             })
             setIsRecording(false)
+            
         }
         setMediaRec(mediaRecorderLocal)
 
