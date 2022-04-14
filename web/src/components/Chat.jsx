@@ -7,6 +7,7 @@ const Chat = () => {
     
     const [messages, setMessages] = useState([])
     const [messageInput, setMessageInput] = useState("")
+    const [unreadCount, setUnreadCount] = useState(0)
     const {socket} = useSocket()
     const bottomOfChatRef = useRef()
     
@@ -24,6 +25,7 @@ const Chat = () => {
         })
         const focusListener = () => {
             document.title = "🔥 C H E S S 🔥"
+            setUnreadCount(0)
         }
         window.addEventListener("focus", focusListener)
         return () => window.removeEventListener("focus", focusListener)
@@ -36,15 +38,20 @@ const Chat = () => {
         socket.on("message-received", ({msg, timestamp}) => {
             // console.log("message-received")
             setMessages(oldMsgs => [...oldMsgs, {type:"msg", msg: `them: ${msg}`, class:'them', timestamp}])
-            if(!document.hasFocus()) {
-                document.title = "📧 N E W  M E S S A G E 📧"
-            }
         })
     }, [socket])
     
     useEffect(() => {
         bottomOfChatRef.current.scrollIntoView({})
+        if(!document.hasFocus()) {
+            setUnreadCount(unreadCount + 1)
+        }
     }, [messages])
+
+    useEffect(() => {
+        if(unreadCount <= 0) return
+        document.title = `📧(${unreadCount}) N E W  M E S S A G E 📧`
+    },[unreadCount])
     
     function sendMessage() {
         if (messageInput.trim() === "") return
