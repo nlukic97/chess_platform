@@ -26,4 +26,10 @@ button {
   outline: none;
   border: none;
   cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+
+  &:hover {
+    background-color: #222;
+  }
 }
