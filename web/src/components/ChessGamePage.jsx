@@ -140,7 +140,7 @@ export function ChessGamePage({fen = false}) {
                         <div>
                         <CustomChessBoard {...gameData} game={game}/>
                         <GameHistory game={game} />
-                        <VoiceChat createdNewVoice={newMsg} setMessages={setMessages}/>
+                        <VoiceChat setMessages={setMessages}/>
                         </div>
                         <Chat messages={messages} setMessages={setMessages}/>
                     </div>
