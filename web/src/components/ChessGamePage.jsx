@@ -129,7 +129,7 @@ export function ChessGamePage({fen = false}) {
     }
 
     function newMsg(){
-        console.log('e');
+        console.log('Epstein didn\'t kill himself');
     }
 
     return (
