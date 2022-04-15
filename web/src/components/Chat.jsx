@@ -47,7 +47,7 @@ const Chat = ({messages, setMessages}) => {
     useEffect(() => {
         bottomOfChatRef.current.scrollIntoView({})
         if(!document.hasFocus()) {
-            setUnreadCount(unreadCount + 1)
+            setUnreadCount(prevUnreadCount => prevUnreadCount  + 1)
         }
     }, [messages])
 
