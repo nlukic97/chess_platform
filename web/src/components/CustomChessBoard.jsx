@@ -46,12 +46,13 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
             setGame(g => {
                 const gameCopy = {...g};
                 gameCopy.move(move)
+                
+                if(gameCopy.in_check()) {
+                    playCheckAudio()
+                }
                 return gameCopy
             })
 
-            if(game.in_check()) {
-                playCheckAudio()
-            }
             // setIsMyTurn(true)
             // console.log(move);
         })
