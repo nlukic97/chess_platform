@@ -119,7 +119,7 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
                 {gotADrawOffer && (
                     <>
                         <button onClick={()=>{socket.emit('accept-draw')}}>accept Draw</button>
-                        <button onClick={()=>{socket.emit('decline-draw')}}>decline Draw</button>
+                        <button onClick={()=>{socket.emit('decline-draw'); setGotADrawOffer(false)}}>decline Draw</button>
                     </>
                 )}
             </div>

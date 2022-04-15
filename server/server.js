@@ -323,6 +323,19 @@ io.on('connection', (socket) => {
     }
   })
   
+  socket.on("uskliknimo", () => {
+    let room = findRoom(socket.id)
+    if(room) {
+      io.in(room.id).emit("uskliknimo")
+    }
+  })
+  
+  socket.on("kanye", () => {
+    let room = findRoom(socket.id)
+    if(room) {
+      io.in(room.id).emit("kanye")
+    }
+  })
   
   // When a user leaves ...
   socket.on('disconnect',()=>{
