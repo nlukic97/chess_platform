@@ -8,7 +8,7 @@ import SoundBoard from './SoundBoard';
 
 export default function CustomChessBoard({pieces, playersTurn, game, setGame, safeGameMutate}) {
     const [playerColor,] = useState(pieces)
-    const [isMyTurn, setIsMyTurn] = useState(playersTurn)
+    // const [isMyTurn, setIsMyTurn] = useState(playersTurn)
     const [gameEnded, setGameEnded] = useState(false)
     const [gotADrawOffer, setGotADrawOffer] = useState(false)
     const [cbWidth, setCbWidth] = useState(Math.min(500, window.outerWidth * .95))
@@ -35,6 +35,9 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
                 // console.log("MOVE IS INVALID");
                 setGame(new Chess(chess))
             }
+            if(game.in_check()) {
+                playCheckAudio()
+            }
             // console.log(valid, chess);
         })
         socket.on("move-made", (move) => {
@@ -44,7 +47,8 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
                 gameCopy.move(move)
                 return gameCopy
             })
-            setIsMyTurn(true)
+
+            // setIsMyTurn(true)
             // console.log(move);
         })
         socket.on("game-over", (msg) => {
@@ -60,6 +64,7 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
             alert('draw offered!');
             setGotADrawOffer(true)
         })
+
         return () => {
             socket.off("make-move")
             socket.off("is-valid")
@@ -68,8 +73,11 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
     }, [socket])
 
     useEffect(() => {
-        console.log("useEffect game changed:", game?.fen());
-    },[game])
+        document.title = ((game.turn() === "b") === playersTurn) ? "🔥 C H E S S 🔥" : "YOUR MOVE!"
+        console.log({playersTurn})
+        console.log("game.turn():", game.turn())
+        return () => document.title = "🔥 C H E S S 🔥"
+    }, [game])
 
     function onDrop(sourceSquare, targetSquare) {
         let move = null;

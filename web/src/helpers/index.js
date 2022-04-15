@@ -4,6 +4,12 @@ export const objToAlgebraic = moveObj => {
     return "Nxe5"
 }
 
+export const playNewMessageSound = () =>{
+    // play received message sound
+    const messageSound = document.createElement('audio')
+    messageSound.src="./audio/newMessage.mp3"
+    messageSound.play()
+}
 export const fischerRandomPositions = [
     "bqnbnrkr/pppppppp/8/8/8/8/PPPPPPPP/BQNBNRKR w KQkq - 0 1",
     "bqnnrbkr/pppppppp/8/8/8/8/PPPPPPPP/BQNNRBKR w KQkq - 0 1",
@@ -965,3 +971,11 @@ export const fischerRandomPositions = [
     "rkrnnbbq/pppppppp/8/8/8/8/PPPPPPPP/RKRNNBBQ w KQkq - 0 1",
     "rkrnnqbb/pppppppp/8/8/8/8/PPPPPPPP/RKRNNQBB w KQkq - 0 1"
 ]
+
+export const playCheckAudio = () => {
+    // plays e zemljace sad sam najebo
+
+    const audio = document.createElement('audio')
+    audio.src = './audio/1.mp3'
+    audio.play()
+}

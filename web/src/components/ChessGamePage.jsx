@@ -47,6 +47,7 @@ GameHistory.propTypes = {game: PropTypes.any};
 
 export function ChessGamePage({fen = false}) {
 
+    const [messages, setMessages] = useState([])
     const {uuid} = useParams()
     const {socket, connect} = useSocket()
     const [gameStarted, setGameStarted] = useState(false)
@@ -127,6 +128,10 @@ export function ChessGamePage({fen = false}) {
         });
     }
 
+    function newMsg(){
+        console.log('Epstein didn\'t kill himself');
+    }
+
     return (
         <div>
             {!isConnected ? <ConnectingLoader/>
@@ -135,9 +140,9 @@ export function ChessGamePage({fen = false}) {
                         <div>
                         <CustomChessBoard {...gameData} game={game}/>
                         <GameHistory game={game} />
-                        <VoiceChat/>
+                        <VoiceChat setMessages={setMessages}/>
                         </div>
-                        <Chat/>
+                        <Chat messages={messages} setMessages={setMessages}/>
                     </div>
                 ) : (
                     <RoomLink roomID={uuid}/>

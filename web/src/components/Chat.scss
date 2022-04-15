@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  word-break: break-all;
+  word-break: break-word;
   max-height: 500px;
   width: 300px;
   border-radius: 4px;
@@ -32,7 +32,18 @@
     color: #111;
 
     .message {
-      padding: 3px 2px;
+     padding: 6px 10px;
+     margin: 3px 0;
+     border-radius: 1em;
+     &.them {
+      //  background-color: #333;
+       background-color: rgb(92, 177, 247);;
+       color: #fff;
+      }
+      &.me {
+       background-color: rgb(131, 148, 161);
+       color: #fff;
+     }
     }
   }
 

@@ -186,6 +186,14 @@ io.on('connection', (socket) => {
     if (typeof cb === "function")
       cb();
   });
+
+  // for voice messages
+  socket.on('sendAudio',(blob)=>{
+    let room = findRoom(socket.id) //returns the room where there is a player with this id
+    if(room){
+      socket.to(room.id).emit('receiveAudio',blob) //sends the event to all users in the room except the sender (so, to the other player)
+    }
+  })
   
   // Socket events and emits
   socket.on('make-move',data=>{
