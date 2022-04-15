@@ -5,6 +5,7 @@ import {useSocket} from "../contexts/SocketProvider";
 import "./CustomChessBoard.scss"
 import GameEndModal from "./GameEndModal";
 import SoundBoard from './SoundBoard';
+import { playCheckAudio } from '../helpers';
 
 export default function CustomChessBoard({pieces, playersTurn, game, setGame, safeGameMutate}) {
     const [playerColor,] = useState(pieces)
@@ -48,6 +49,9 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
                 return gameCopy
             })
 
+            if(game.in_check()) {
+                playCheckAudio()
+            }
             // setIsMyTurn(true)
             // console.log(move);
         })
