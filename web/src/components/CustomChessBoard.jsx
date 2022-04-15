@@ -4,12 +4,14 @@ import {Chessboard} from 'react-chessboard';
 import {useSocket} from "../contexts/SocketProvider";
 import "./CustomChessBoard.scss"
 import GameEndModal from "./GameEndModal";
+import SoundBoard from './SoundBoard';
 import { playCheckAudio } from '../helpers';
 
 export default function CustomChessBoard({pieces, playersTurn, game, setGame, safeGameMutate}) {
     const [playerColor,] = useState(pieces)
     // const [isMyTurn, setIsMyTurn] = useState(playersTurn)
     const [gameEnded, setGameEnded] = useState(false)
+    const [gotADrawOffer, setGotADrawOffer] = useState(false)
     const [cbWidth, setCbWidth] = useState(Math.min(500, window.outerWidth * .95))
     const {socket} = useSocket()
 
@@ -44,6 +46,10 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
             setGame(g => {
                 const gameCopy = {...g};
                 gameCopy.move(move)
+                
+                if(gameCopy.in_check()) {
+                    playCheckAudio()
+                }
                 return gameCopy
             })
 
@@ -52,6 +58,7 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
         })
         socket.on("game-over", (msg) => {
             setGameEnded(msg)
+            setGotADrawOffer(false)
         })
 
         socket.on('draw-declined',()=>{
@@ -60,19 +67,7 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
         
         socket.on('draw-offered',()=>{
             alert('draw offered!');
-        })
-
-        // The audio element
-        let audio = document.querySelector('#dame-dameyu')
-        audio.addEventListener('timeupdate',(e)=>{
-            console.log(audio.currentTime);
-            if(audio.currentTime > 8){
-                audio.pause()
-                audio.currentTime = 0
-            }
-        })
-        socket.on('dame-dameyu',()=>{
-            audio.play()  
+            setGotADrawOffer(true)
         })
 
         return () => {
@@ -112,31 +107,36 @@ export default function CustomChessBoard({pieces, playersTurn, game, setGame, sa
     // const fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"
 
     return (
-        <div className="CustomChessBoard">
-            <Chessboard
-                position={game?.fen()}
-                areArrowsAllowed={true}
-                // arePiecesDraggable={isMyTurn}
-                arePremovesAllowed={true}
-                animationDuration={100}
-                boardOrientation={playerColor}
-                boardWidth={cbWidth}
-                clearPremovesOnRightClick={true}
-                onPieceDrop={onDrop}
-                showBoardNotation={true}
-            />
+        <div>
+            <div className="CustomChessBoard">
+                <Chessboard
+                    position={game?.fen()}
+                    areArrowsAllowed={true}
+                    // arePiecesDraggable={isMyTurn}
+                    arePremovesAllowed={true}
+                    animationDuration={100}
+                    boardOrientation={playerColor}
+                    boardWidth={cbWidth}
+                    clearPremovesOnRightClick={true}
+                    onPieceDrop={onDrop}
+                    showBoardNotation={true}
+                />
+            </div>
             {gameEnded && <GameEndModal winner={gameEnded.winner} reason={gameEnded.reason}
                                         closeModal={() => setGameEnded(false)}/>}
-            <button onClick={()=>{socket.emit('resign')}}>Resign</button>
-            <button onClick={()=>{socket.emit('offer-draw')}}>Draw</button>
-            <button onClick={()=>{socket.emit('accept-draw')}}>accept Draw</button>
-            <button onClick={()=>{socket.emit('decline-draw')}}>decline Draw</button>
-            <button onClick={()=>{socket.emit('dame-dameyu')}}>dame-dameyu</button>
-            {/* Audio element */}
-            <audio id='dame-dameyu' style={{opacity:0}}>
-                <source src="./audio/dame-dameyu.mp3" type="audio/mp3"/>
-                Your browser does not support the audio element.
-            </audio>
+            <div>
+                <button onClick={()=>{socket.emit('resign')}}>Resign</button>
+                <button onClick={()=>{socket.emit('offer-draw')}}>Draw</button>
+            </div>
+            <div>
+                {gotADrawOffer && (
+                    <>
+                        <button onClick={()=>{socket.emit('accept-draw')}}>accept Draw</button>
+                        <button onClick={()=>{socket.emit('decline-draw'); setGotADrawOffer(false)}}>decline Draw</button>
+                    </>
+                )}
+            </div>
+            <SoundBoard />
         </div>
     );
 }
