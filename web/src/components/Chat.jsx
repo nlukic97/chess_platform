@@ -4,6 +4,7 @@ import "./Chat.scss"
 import {FiSend} from "react-icons/all";
 
 import { playNewMessageSound } from '../helpers';
+import AudioMessage from './AudioMessage';
 const Chat = ({messages, setMessages}) => {
     
     
@@ -79,7 +80,8 @@ const Chat = ({messages, setMessages}) => {
             messages.map(msg => msg.type === "msg" ?
             (<div className={msg.class + ' message'} key={msg.timestamp}>{msg.msg}</div>)
             : 
-            <audio className={msg.class + ' message'} key={msg.timestamp} src={msg.src} controls style={{width:'100%'}}></audio>
+            // <audio className={msg.class + ' message'} key={msg.timestamp} src={msg.src} controls style={{width:'100%'}}></audio>
+            <AudioMessage msg={msg} key={msg.timestamp} />
             )
             
         }

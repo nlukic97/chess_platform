@@ -1,0 +1,50 @@
+#player {
+    background-color: red;
+    height: 30px;
+}
+
+.custom-player-container {
+    height: 20px;
+    position: relative;
+    border-radius: 100px;
+    overflow: hidden;
+
+    &.them {
+        background-color: rgb(131, 148, 161);
+        
+        .progress-bar {
+            background-color: rgb(100, 113, 124);
+        }
+    }
+
+    &.me {
+        background-color: rgb(92, 177, 247);
+
+        .progress-bar {
+            background-color: rgb(42, 148, 235);
+        }
+    }
+
+    .play-btn {
+        background-color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        position: relative;
+        z-index: 3;
+        margin-left: 2%;
+
+        :hover {
+            cursor: pointer;
+        }
+    }
+    
+    .progress-bar {
+        position: absolute;
+        top:0;
+        left:0;
+        height: 100%;
+        width: 0%;
+    }
+}
