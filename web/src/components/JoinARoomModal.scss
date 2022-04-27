@@ -1,41 +1,41 @@
 .game-id-form {
-  min-height: 100px;
-  min-width: 350px;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  box-shadow: 0 7px 32px 5px rgba(0, 0, 0, 0.3);
-  padding: 24px;
-  position: relative;
+	min-height: 100px;
+	min-width: 350px;
+	background-color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 10px;
+	box-shadow: 0 7px 32px 5px rgba(0, 0, 0, 0.3);
+	padding: 24px;
+	position: relative;
 
-  .input-wrapper {
-    flex: 1;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-  }
+	.input-wrapper {
+		flex: 1;
+		padding: 10px;
+		display: flex;
+		flex-direction: column;
+	}
 
-  .FEN {
-    width: 320px;
-  }
+	.FEN {
+		width: 320px;
+	}
 
-  span {
-    color: red;
-    font-size: 12px;
-    padding: 4px;
-    font-weight: bold;
-  }
+	span {
+		color: red;
+		font-size: 12px;
+		padding: 4px;
+		font-weight: bold;
+	}
 
-  .btn-wrapper {
-    flex-basis: 50px;
-  }
+	.btn-wrapper {
+		flex-basis: 50px;
+	}
 
-  .modal-close-x {
-    position: absolute;
-    top: 7px;
-    right: 7px;
-    cursor: pointer;
-  }
+	.modal-close-x {
+		position: absolute;
+		top: 7px;
+		right: 7px;
+		cursor: pointer;
+	}
 }

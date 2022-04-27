@@ -1,61 +1,61 @@
 .game-chat-wrapper {
-  display: flex;
-  margin: 100px 0 0 0;
-  justify-content: center;
-  gap: 20px;
+	display: flex;
+	margin: 100px 0 0 0;
+	justify-content: center;
+	gap: 20px;
 
-  & > *:first-child {
-    width: calc(min(500px, 95vw));
-  }
+	& > *:first-child {
+		width: calc(min(500px, 95vw));
+	}
 
-  @media screen and (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-    margin: 50px 0;
+	@media screen and (max-width: 768px) {
+		flex-direction: column;
+		align-items: center;
+		margin: 50px 0;
 
-    & > *:last-child {
-      width: calc(min(500px, 95vw));
-    }
-  }
+		& > *:last-child {
+			width: calc(min(500px, 95vw));
+		}
+	}
 }
 
 .loader-spinner {
-  height: 50px;
-  width: 50px;
-  border-radius: 50%;
-  border: 10px solid gray;
-  border-top: 10px solid white;
-  animation: spin 1s infinite;
+	height: 50px;
+	width: 50px;
+	border-radius: 50%;
+	border: 10px solid gray;
+	border-top: 10px solid white;
+	animation: spin 1s infinite;
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 .waiting-room {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: white;
-  padding: 48px;
-  border-radius: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	background-color: white;
+	padding: 48px;
+	border-radius: 8px;
 
-  .room-id-wrapper {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    align-items: center;
-  }
+	.room-id-wrapper {
+		display: flex;
+		justify-content: space-between;
+		gap: 15px;
+		align-items: center;
+	}
 
-  .room-id-label {
-    background-color: #f1f1f1;
-    flex: 1;
-    padding: 8px;
-    color: #0093ff;
-  }
+	.room-id-label {
+		background-color: #f1f1f1;
+		flex: 1;
+		padding: 8px;
+		color: #0093ff;
+	}
 }

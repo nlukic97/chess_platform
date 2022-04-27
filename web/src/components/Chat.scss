@@ -1,54 +1,58 @@
 .messages-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  word-break: break-word;
-  max-height: 500px;
-  width: 300px;
-  border-radius: 4px;
-  background-color: white;
-  box-shadow: 0 7px 31px 5px rgba(0, 0, 0, 0.51);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	word-break: break-word;
+	max-height: 500px;
+	width: 300px;
+	border-radius: 4px;
+	background-color: white;
+	box-shadow: 0 7px 31px 5px rgba(0, 0, 0, 0.51);
 
-  .chat-form {
-    // TODO: Ako vidis ovo onda nesto ne valja
-    background-color: red;
-    display: flex;
-    justify-content: space-between;
+	.chat-form {
+		// TODO: Ako vidis ovo onda nesto ne valja
+		background-color: red;
+		display: flex;
+		justify-content: space-between;
 
-    input {
-      flex: 1;
-    }
+		input {
+			flex: 1;
+		}
 
-    button {
-      flex-basis: 50px;
-    }
-  }
+		button {
+			flex-basis: 50px;
+		}
+	}
 
-  .messages-container {
-    flex: 1;
-    padding: 24px;
-    margin-bottom: 5px;
-    overflow: auto;
-    color: #111;
+	.messages-container {
+		flex: 1;
+		padding: 24px;
+		margin-bottom: 5px;
+		overflow: auto;
+		color: #111;
 
-    .message {
-     padding: 6px 10px;
-     margin: 3px 0;
-     border-radius: 1em;
-     &.them {
-      //  background-color: #333;
-       background-color: rgb(92, 177, 247);;
-       color: #fff;
-      }
-      &.me {
-       background-color: rgb(131, 148, 161);
-       color: #fff;
-     }
-    }
-  }
+		.message {
+			padding: 6px 10px;
+			margin: 3px 0;
+			border-radius: 1em;
+			&.them {
+				//  background-color: #333;
+				background-color: rgb(92, 177, 247);
+				color: #fff;
+			}
+			&.me {
+				background-color: rgb(131, 148, 161);
+				color: #fff;
+			}
+			&.officialMessage {
+				background-color: rgb(57, 66, 69);
+				color: #fff;
+			}
+		}
+	}
 
-  @media screen and (max-width: 768px) {
-    height: 300px;
-    width: 500px;
-  }
+	@media screen and (max-width: 768px) {
+		height: 300px;
+		width: 500px;
+	}
 }
